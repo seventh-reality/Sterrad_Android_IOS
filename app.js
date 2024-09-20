@@ -1,136 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js and OnirixSDK Example</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #000;
-        }
-
-        canvas {
-            display: block;
-        }
-
-        #model-controls {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-40%, 200%);
-            padding: 20px;
-            margin: auto;
-            width: 240px;
-            padding: 25px;
-        }
-
-        #model1, #model2, #model3 {
-            background-color: #FFFFFF00;
-            border: 0;
-        }
-
-        #tap-to-place {
-            display: block;
-            margin: auto;
-            width: 200px;
-            padding: 25px;
-            background-color: #231532;
-            color: #FFFFFF;
-            border: 0;
-            border-radius: 20px;
-            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-        }
-
-        button {
-            margin-right: 10px;
-        }
-
-        #transform-controls, #color-controls {
-            display: none;
-            position: static;
-            top: 20px;
-            left: 20px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        #loading-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        #error-screen {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 0, 0, 0.7);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        #UItext {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, 150%);
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        #one, #two, #three {
-            display: none;
-            scale: .7;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="UItext">
-        <img id="one" src="one.png"></img>
-        <img id="two" src="two.png"></img>
-        <img id="three" src="three.png"></img>
-    </div>
-    <div id="transform-controls">
-        <button id="tap-to-place">Place Model</button>
-    </div>
-    <div id="color-controls">
-        <button id="black">Black</button>
-        <button id="blue">Blue</button>
-        <button id="orange">Orange</button>
-        <button id="silver">Silver</button>
-    </div>
-    <div id="model-controls">
-        <button id="model1"><img src="Icon.png" style="width:40px;height:40px;"></button>
-        <button id="model2"><img src="Icon_1.png" style="width:40px;height:40px;"></button>
-        <button id="model3"><img src="Icon_2.png" style="width:40px;height:40px;"></button>
-    </div>
-    <div id="loading-screen">Loading...</div>
-    <div id="error-screen">
-        <div id="error-title"></div>
-        <div id="error-message"></div>
-    </div>
-
-    <script type="module">
-        import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk.esm.js";
+import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk.esm.js";
         import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
         import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
         import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
@@ -146,7 +14,7 @@
             _animationMixers = [];
             _clock = null;
             _carPlaced = false;
-
+            _gltfData = [];
             oxSDK;
 
             async init() {
@@ -156,7 +24,10 @@
 
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
-                    this.setupControls();
+                    this.setupControls(renderCanvas);
+                    let isRotating = false;
+                    let touchStartAngle = 0;
+                    let initialRotationY = 0;
 
                     const textureLoader = new THREE.TextureLoader();
                     this._envMap = textureLoader.load("envmap.jpg");
@@ -193,12 +64,13 @@
                         }
                     });
 
-                    const modelsToLoad = ["Steerad.glb", "Steeradtext.glb", "sterrad_anim.glb"];
+                    const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
                     const gltfLoader = new GLTFLoader();
                     modelsToLoad.forEach((modelUrl, index) => {
                         gltfLoader.load(modelUrl, (gltf) => {
                             try {
                                 const model = gltf.scene;
+
                                 model.traverse((child) => {
                                     if (child.material) {
                                         child.material.envMap = this._envMap;
@@ -213,9 +85,9 @@
 
                                     setTimeout(() => {
                                         mixer.stopAllAction();
-                                    }, 50000);
+                                    }, 9999);
                                 }
-
+                                this._gltfData[index] = gltf;
                                 this._models[index] = model;
                                 if (index === 0) {
                                     this._currentModel = model;
@@ -279,32 +151,44 @@
                     this._scene.add(ambientLight);
                 } catch (err) {
                     console.error("Error setting up renderer", err);
-                    throw err;
                 }
             }
 
-            setupControls() {
+            addLights() {
                 try {
-                    this._controls = new OrbitControls(this._camera, this._renderer.domElement);
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                    directionalLight.position.set(5, 10, 7.5);
+                    directionalLight.castShadow = true;
+                    this._scene.add(directionalLight);
+
+                    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+                    pointLight.position.set(5, 10, 5);
+                    this._scene.add(pointLight);
+                } catch (err) {
+                    console.error("Error adding lights", err);
+                }
+            }
+
+            setupControls(renderCanvas) {
+                try {
+                    this._controls = new OrbitControls(this._camera, renderCanvas);
                     this._controls.enableDamping = true;
                     this._controls.dampingFactor = 0.25;
-                    this._controls.screenSpacePanning = false;
-                    this._controls.maxPolarAngle = Math.PI / 2;
-                    this._controls.update();
-                } catch (err) {
-                    console.error("Error setting up OrbitControls", err);
-                    throw err;
-                }
-            }
+                    this._controls.enableZoom = true;
+                    this._controls.enableRotate = true;
+                    this._controls.enablePan = false;
 
-            updatePose(pose) {
-                try {
-                    this._camera.position.copy(pose.position);
-                    this._camera.quaternion.copy(pose.rotation);
-                    this._camera.projectionMatrix.fromArray(pose.projection);
-                    this._camera.updateMatrixWorld(true);
+                    renderCanvas.addEventListener('touchstart', (event) => {
+                        if (event.touches.length === 2) {
+                            this._controls.enablePan = false;
+                        }
+                    });
+
+                    renderCanvas.addEventListener('touchend', () => {
+                        this._controls.enablePan = false;
+                    });
                 } catch (err) {
-                    console.error("Error updating camera pose", err);
+                    console.error("Error setting up controls", err);
                 }
             }
 
@@ -313,62 +197,291 @@
                     this._controls.update();
                     this._renderer.render(this._scene, this._camera);
                 } catch (err) {
-                    console.error("Error during render", err);
+                    console.error("Error during rendering", err);
+                }
+            }
+
+            updatePose(pose) {
+                try {
+                    let modelViewMatrix = new THREE.Matrix4();
+                    modelViewMatrix = modelViewMatrix.fromArray(pose);
+                    this._camera.matrix = modelViewMatrix;
+                    this._camera.matrixWorldNeedsUpdate = true;
+                } catch (err) {
+                    console.error("Error updating pose", err);
                 }
             }
 
             onResize() {
                 try {
+                    const width = this._renderer.domElement.width;
+                    const height = this._renderer.domElement.height;
                     const cameraParams = this.oxSDK.getCameraParameters();
                     this._camera.fov = cameraParams.fov;
                     this._camera.aspect = cameraParams.aspect;
                     this._camera.updateProjectionMatrix();
-
-                    const renderCanvas = this._renderer.domElement;
-                    this._renderer.setSize(renderCanvas.width, renderCanvas.height);
+                    this._renderer.setSize(width, height);
                 } catch (err) {
-                    console.error("Error during resize", err);
+                    console.error("Error handling resize", err);
                 }
             }
 
-            addLights() {
-                try {
-                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-                    directionalLight.position.set(0, 10, 5);
-                    this._scene.add(directionalLight);
-                } catch (err) {
-                    console.error("Error adding lights", err);
+            changeModelsColor(value) {
+                if (this._currentModel) {
+                    this._currentModel.traverse((child) => {
+                        if (child.material) {
+                            child.material.color.setHex(value);
+                        }
+                    });
                 }
+            }
+
+            // switchModel(index) {
+            //     if (this._currentModel) {
+            //         this._scene.remove(this._currentModel);
+            //     }
+            //     this._currentModel = this._models[index];
+            //     if (this._currentModel) {
+            //         this._scene.add(this._currentModel);
+            //     }
+            // }
+            switchModel(index) {
+                // Stop and remove the current model from the scene
+                if (this._currentModel) {
+                    this._scene.remove(this._currentModel);
+
+                    // Stop all animations of the current model
+                    const currentMixer = this._animationMixers[index];
+                    if (currentMixer) {
+                        currentMixer.stopAllAction();
+                    }
+                }
+
+                // Set the new model as the current model
+                this._currentModel = this._models[index];
+                if (this._currentModel) {
+                    this._scene.add(this._currentModel);
+
+                    // Initialize animation if the model has animations
+                    const mixer = new THREE.AnimationMixer(this._currentModel);
+                    const gltf = this._gltfData[index]; // Assuming you store the GLTF data
+
+                    if (gltf && gltf.animations && gltf.animations.length) {
+                        gltf.animations.forEach((clip) => {
+                            mixer.clipAction(clip).play();
+                        });
+                        this._animationMixers[index] = mixer; // Store the mixer for the new model
+                        setTimeout(() => {
+                            mixer.stopAllAction();
+                        }, 9999);
+                    }
+                }
+            }
+            // playAudio(audioFile) {
+            //     const audio = new Audio(audioFile);
+            //     audio.play();
+            // }
+        }
+        let previousTouch = null;
+       function onTouchStart(event) {
+            if (event.touches.length === 1) {
+                previousTouch = { x: event.touches[0].clientX, y: event.touches[0].clientY };
             }
         }
 
-        const oxExperience = new OxExperience();
-        oxExperience.init();
+        function onTouchMove(event) {
+            if (event.touches.length === 1 && previousTouch) {
+                const touch = event.touches[0];
+                const deltaX = touch.clientX - previousTouch.x;
+                const deltaY = touch.clientY - previousTouch.y;
 
-        const tapToPlaceButton = document.getElementById("tap-to-place");
-        tapToPlaceButton.addEventListener("click", () => oxExperience.placeCar());
+                // Update cube rotation based on touch movement
+                cube.rotation.y += deltaX * 0.01; // Adjust sensitivity as needed
+                cube.rotation.x += deltaY * 0.01;
 
-        document.getElementById("model1").addEventListener("click", () => {
-            oxExperience.changeModel(0);
-            document.getElementById("one").style.display = "block";
-            document.getElementById("two").style.display = "none";
-            document.getElementById("three").style.display = "none";
-        });
+                // Update previous touch position
+                previousTouch = { x: touch.clientX, y: touch.clientY };
+            }
+        }
 
-        document.getElementById("model2").addEventListener("click", () => {
-            oxExperience.changeModel(1);
-            document.getElementById("one").style.display = "none";
-            document.getElementById("two").style.display = "block";
-            document.getElementById("three").style.display = "none";
-        });
+         function onTouchEnd() {
+            previousTouch = null; // Reset on touch end
+        }
+        // Event listeners
+        window.addEventListener('touchstart', onTouchStart);
+        window.addEventListener('touchmove', onTouchMove);
+        window.addEventListener('touchend', onTouchEnd);
+        class OxExperienceUI {
+            _loadingScreen = null;
+            _errorScreen = null;
+            _errorTitle = null;
+            _errorMessage = null;
 
-        document.getElementById("model3").addEventListener("click", () => {
-            oxExperience.changeModel(2);
-            document.getElementById("one").style.display = "none";
-            document.getElementById("two").style.display = "none";
-            document.getElementById("three").style.display = "block";
-        });
-    </script>
-</body>
+            init() {
+                try {
+                    this._loadingScreen = document.querySelector("#loading-screen");
+                    this._errorScreen = document.querySelector("#error-screen");
+                    this._errorTitle = document.querySelector("#error-title");
+                    this._errorMessage = document.querySelector("#error-message");
 
-</html>
+                    this._transformControls = document.querySelector("#transform-controls");
+                    this._colorControls = document.querySelector("#color-controls");
+                    this._modelControls = document.querySelector("#model-controls");
+                    this._backbutton = document.querySelector("#back-button");
+                    this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
+                    this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
+
+                    document.querySelector("#tap-to-place").addEventListener("click", () => {
+                        oxExp.placeCar();
+                        this._transformControls.style.display = "none";
+                        this._colorControls.style.display = "none";
+                        this._modelControls.style.display = "flex";
+                        this._insidebuttonscontrols.style.display = "none";
+                        this._insidebuttonscontrols1.style.display = "none";
+                        this._backbutton.style.display = "none";
+                    });
+
+                    document.querySelector("#black").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0x000000);
+                    });
+                    document.querySelector("#blue").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0x0000ff);
+                    });
+                    document.querySelector("#orange").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0xffa500);
+                    });
+                    document.querySelector("#silver").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0xc0c0c0);
+                    });
+
+                    document.querySelector("#model1").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        playAudio("Feture.mp3");
+
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('model-controls').style.display = 'none';
+
+                    });
+                    document.querySelector("#model2").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        playAudio("Feture.mp3");
+
+                        document.getElementById('insidebuttons-controls1').style.display = 'block';
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('model-controls').style.display = 'none';
+
+
+                    });
+                    document.querySelector("#back").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        // playAudio("");
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'none';
+                        document.getElementById('model-controls').style.display = 'flex';
+
+                    });
+                    document.querySelector("#ins1").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        playAudio("Intro.mp3");
+
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+
+
+                    });
+                    document.querySelector("#ins2").addEventListener("click", () => {
+                        oxExp.switchModel(1);
+                        playAudio("parts.mp3");
+
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins3").addEventListener("click", () => {
+                        oxExp.switchModel(2);
+                        playAudio("Usage.mp3");
+
+
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins4").addEventListener("click", () => {
+                        oxExp.switchModel(3);
+                        playAudio("USP_1.mp3");
+
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('insidebuttons-controls1').style.display = 'block';
+                        document.getElementById('back-button').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins5").addEventListener("click", () => {
+                        oxExp.switchModel(4);
+                        playAudio("USP_2.mp3");
+
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('insidebuttons-controls1').style.display = 'block';
+                        document.getElementById('back-button').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins6").addEventListener("click", () => {
+                        oxExp.switchModel(5);
+                        playAudio("USP_3.mp3");
+
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('insidebuttons-controls1').style.display = 'block';
+                        document.getElementById('back-button').style.display = 'block';
+
+                    });
+
+                } catch (err) {
+                    console.error("Error initializing UI", err);
+                }
+            }
+
+            hideLoading() {
+                this._loadingScreen.style.display = "none";
+                this._transformControls.style.display = "block";
+            }
+
+            showError(title, message) {
+                this._errorTitle.textContent = title;
+                this._errorMessage.textContent = message;
+                this._errorScreen.style.display = "block";
+            }
+        }
+        var audio = document.getElementById('audioPlayer');
+
+        function playAudio(audioFile) {
+            // Stop current audio if playing
+            if (!audio.paused) {
+                audio.pause();
+                audio.currentTime = 0; // Reset time to start
+            }
+
+            // Set the new audio source and play
+            audio.src = audioFile;
+            audio.play().catch(function (error) {
+                console.log('Playback prevented:', error);
+            });
+        }
+        const oxExp = new OxExperience();
+        const oxUI = new OxExperienceUI();
+
+        oxExp
+            .init()
+            .then(() => {
+                oxUI.init();
+                oxUI.hideLoading();
+            })
+            .catch((error) => {
+                console.error("Error initializing Onirix SDK", error);
+                oxUI.showError("Initialization Error", error.message);
+            });
