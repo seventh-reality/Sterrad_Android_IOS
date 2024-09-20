@@ -70,7 +70,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk
                         gltfLoader.load(modelUrl, (gltf) => {
                             try {
                                 const model = gltf.scene;
-
+                                this._scene.scale.set(0.5, 0.5, 0.5);
                                 model.traverse((child) => {
                                     if (child.material) {
                                         child.material.envMap = this._envMap;
@@ -225,7 +225,14 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk
                     console.error("Error handling resize", err);
                 }
             }
+                
+           scaleCar(value) {
+        this._scene.scale.set(value, value, value);
+    }
 
+    rotateCar(value) {
+        this._scene.rotation.y = value;
+    }
             changeModelsColor(value) {
                 if (this._currentModel) {
                     this._currentModel.traverse((child) => {
@@ -325,6 +332,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk
                     this._errorMessage = document.querySelector("#error-message");
 
                     this._transformControls = document.querySelector("#transform-controls");
+                    this._scaleSlider = document.querySelector("#scale-slider");
+                    this._rotationSlider = document.querySelector("#rotation-slider");    
                     this._colorControls = document.querySelector("#color-controls");
                     this._modelControls = document.querySelector("#model-controls");
                     this._backbutton = document.querySelector("#back-button");
@@ -353,6 +362,14 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk
                     document.querySelector("#silver").addEventListener("click", () => {
                         oxExp.changeModelsColor(0xc0c0c0);
                     });
+                    onScaleChange(listener) {
+        this._scaleSlider.addEventListener('input', () => { listener(this._scaleSlider.value / 100) });
+    }
+
+    onRotationChange(listener) {
+        this._rotationSlider.addEventListener('input', () => { listener(this._rotationSlider.value * Math.PI / 180) });
+    }
+    
 
                     document.querySelector("#model1").addEventListener("click", () => {
                         oxExp.switchModel(0);
@@ -472,6 +489,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk
                 console.log('Playback prevented:', error);
             });
         }
+     oxUI.onRotationChange((value) => { oxExp.rotateCar(value) })
+     oxUI.onScaleChange((value) => { oxExp.scaleCar(value) })
         const oxExp = new OxExperience();
         const oxUI = new OxExperienceUI();
 
