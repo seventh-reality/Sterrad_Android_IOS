@@ -323,6 +323,12 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk
             _errorScreen = null;
             _errorTitle = null;
             _errorMessage = null;
+                this._scaleSlider.addEventListener('input', () => { listener(this._scaleSlider.value / 100) });
+                           }
+
+    onRotationChange(listener) {
+        this._rotationSlider.addEventListener('input', () => { listener(this._rotationSlider.value * Math.PI / 180) });
+    }
 
             init() {
                 try {
@@ -363,12 +369,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.6.5/dist/ox-sdk
                         oxExp.changeModelsColor(0xc0c0c0);
                     });
                     onScaleChange(listener) {
-        this._scaleSlider.addEventListener('input', () => { listener(this._scaleSlider.value / 100) });
-    }
-
-    onRotationChange(listener) {
-        this._rotationSlider.addEventListener('input', () => { listener(this._rotationSlider.value * Math.PI / 180) });
-    }
+        
     
 
                     document.querySelector("#model1").addEventListener("click", () => {
