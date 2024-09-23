@@ -434,8 +434,8 @@
         <button id="ins3"><img src="usage.png" style="width:72px;height:40px;"></button>
     </div>
     <div id="insidebuttons-controls1">
-        <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button>
         <button id="ins5"><img src="usp2.png" style="width:72px;height:40px;"></button>
+        <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button>
         <button id="ins6"><img src="usp3.png" style="width:72px;height:40px;"></button>
     </div>
     <div id="loading-screen">Loading...</div>
@@ -862,8 +862,8 @@
 
                     });
                     document.querySelector("#ins4").addEventListener("click", () => {
-                        oxExp.switchModel(3);
-                        playAudio("USP_1.mp3");
+                        oxExp.switchModel(4);
+                        playAudio("USP_2.mp3");
 
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
@@ -871,8 +871,8 @@
 
                     });
                     document.querySelector("#ins5").addEventListener("click", () => {
-                        oxExp.switchModel(4);
-                        playAudio("USP_2.mp3");
+                        oxExp.switchModel(3);
+                        playAudio("USP_1.mp3");
 
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
