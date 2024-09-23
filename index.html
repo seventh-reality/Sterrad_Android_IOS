@@ -824,6 +824,7 @@
                         document.getElementById('insidebuttons-controls1').style.display = 'none';
                         document.getElementById('back-button').style.display = 'block';
                         document.getElementById('model-controls').style.display = 'none';
+                        document.getElementById('errorimg').style.display = 'none';
 
                     });
                     document.querySelector("#model2").addEventListener("click", () => {
@@ -834,6 +835,7 @@
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('back-button').style.display = 'block';
                         document.getElementById('model-controls').style.display = 'none';
+                        document.getElementById('errorimg').style.display = 'none';
 
 
                     });
@@ -844,12 +846,13 @@
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('back-button').style.display = 'none';
                         document.getElementById('model-controls').style.display = 'flex';
+                        document.getElementById('errorimg').style.display = 'none';
 
                     });
                     document.querySelector("#ins1").addEventListener("click", () => {
                         oxExp.switchModel(0);
                         playAudio("Intro.mp3");
-
+                        document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'block';
                         document.getElementById('insidebuttons-controls1').style.display = 'none';
                         document.getElementById('back-button').style.display = 'block';
@@ -859,7 +862,7 @@
                     document.querySelector("#ins2").addEventListener("click", () => {
                         oxExp.switchModel(1);
                         playAudio("parts.mp3");
-
+                        document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'block';
                         document.getElementById('insidebuttons-controls1').style.display = 'none';
                         document.getElementById('back-button').style.display = 'block';
@@ -869,7 +872,7 @@
                         oxExp.switchModel(2);
                         playAudio("Usage.mp3");
 
-
+                        document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'block';
                         document.getElementById('insidebuttons-controls1').style.display = 'none';
                         document.getElementById('back-button').style.display = 'block';
@@ -882,12 +885,13 @@
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
                         document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('errorimg').style.display = 'block';
 
                     });
                     document.querySelector("#ins5").addEventListener("click", () => {
                         oxExp.switchModel(4);
                         playAudio("USP_2.mp3");
-                        document.getElementById('errorimg').style.display = 'block';
+                        document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
                         document.getElementById('back-button').style.display = 'block';
@@ -896,7 +900,7 @@
                     document.querySelector("#ins6").addEventListener("click", () => {
                         oxExp.switchModel(5);
                         playAudio("USP_3.mp3");
-
+                        document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
                         document.getElementById('back-button').style.display = 'block';
