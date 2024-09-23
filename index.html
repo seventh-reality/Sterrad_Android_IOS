@@ -14,6 +14,10 @@
             scale: .6;
             transform: translate(0%, 0%);
         }
+         #ins7 {   
+            display: none;
+            transform: translate(0%, 0%);
+        }
 
         #ins1:hover {
             background-color: #92cfc2;
@@ -455,10 +459,10 @@
         <button id="ins2"><img src="parts.png" style="width:72px;height:40px;"></button>
         <button id="ins3"><img src="usage.png" style="width:72px;height:40px;"></button>
     </div>
+     <button id="ins7"><img src="usp1.png" style="width:72px;height:40px;"></button>
     <div id="insidebuttons-controls1">
         <button id="ins5"><img src="usp2.png" style="width:72px;height:40px;"></button>
-        <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button>
-        <button id="ins7"><img src="usp1.png" style="width:72px;height:40px;"></button>
+        <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button> 
         <button id="ins6"><img src="usp3.png" style="width:72px;height:40px;"></button>
     </div>
     <div id="loading-screen">Loading...</div>
@@ -793,7 +797,7 @@
                     this._errorScreen = document.querySelector("#error-screen");
                     this._errorTitle = document.querySelector("#error-title");
                     this._errorMessage = document.querySelector("#error-message");
-
+                    this._ins7 = document.querySelector("#ins7");
                     this._transformControls = document.querySelector("#transform-controls");
                     this._colorControls = document.querySelector("#color-controls");
                     this._errorimg = document.querySelector("#errorimg");
