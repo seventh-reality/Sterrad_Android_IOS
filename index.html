@@ -137,7 +137,7 @@
             padding: 25px;
         }
         #errorimg {
-            display: block;
+            display: none;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -786,6 +786,7 @@
 
                     this._transformControls = document.querySelector("#transform-controls");
                     this._colorControls = document.querySelector("#color-controls");
+                    this._errorimg = document.querySelector("#errorimg");
                     this._modelControls = document.querySelector("#model-controls");
                     this._backbutton = document.querySelector("#back-button");
                     this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
@@ -886,7 +887,7 @@
                     document.querySelector("#ins5").addEventListener("click", () => {
                         oxExp.switchModel(4);
                         playAudio("USP_2.mp3");
-
+                        document.getElementById('errorimg').style.display = 'block';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
                         document.getElementById('back-button').style.display = 'block';
