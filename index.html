@@ -34,6 +34,10 @@
             background-color: #92cfc2;
             border-radius: 5px;
         }
+        #ins7:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
 
         #ins5:hover {
             background-color: #92cfc2;
@@ -251,6 +255,11 @@
             border: 0;
             scale: .9;
         }
+        #ins7 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
 
         #ins5 {
             background-color: #FFFFFF00;
@@ -449,6 +458,7 @@
     <div id="insidebuttons-controls1">
         <button id="ins5"><img src="usp2.png" style="width:72px;height:40px;"></button>
         <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button>
+        <button id="ins7"><img src="usp1.png" style="width:72px;height:40px;"></button>
         <button id="ins6"><img src="usp3.png" style="width:72px;height:40px;"></button>
     </div>
     <div id="loading-screen">Loading...</div>
@@ -836,6 +846,7 @@
                         document.getElementById('back-button').style.display = 'block';
                         document.getElementById('model-controls').style.display = 'none';
                         document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('ins7').style.display = 'none';
 
 
                     });
@@ -847,6 +858,8 @@
                         document.getElementById('back-button').style.display = 'none';
                         document.getElementById('model-controls').style.display = 'flex';
                         document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
 
                     });
                     document.querySelector("#ins1").addEventListener("click", () => {
@@ -886,6 +899,19 @@
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
                         document.getElementById('back-button').style.display = 'block';
                         document.getElementById('errorimg').style.display = 'block';
+                        document.getElementById('ins7').style.display = 'block';
+                        document.getElementById('ins4').style.display = 'none';
+
+                    });
+                     document.querySelector("#ins7").addEventListener("click", () => {
+                        oxExp.switchModel(3);
+                        playAudio("write.mp3");
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('insidebuttons-controls1').style.display = 'block';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('errorimg').style.display = 'block';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
 
                     });
                     document.querySelector("#ins5").addEventListener("click", () => {
@@ -895,6 +921,8 @@
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
                         document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
 
                     });
                     document.querySelector("#ins6").addEventListener("click", () => {
@@ -904,6 +932,8 @@
                         document.getElementById('insidebuttons-controls').style.display = 'none';
                         document.getElementById('insidebuttons-controls1').style.display = 'block';
                         document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
 
                     });
 
