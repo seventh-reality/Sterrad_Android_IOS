@@ -499,10 +499,11 @@
             _controls = null;
             _animationMixers = [];
             _clock = null;
-            _carPlaced = false;
+            _CarPlaced = false;
             _gltfData = [];
             oxSDK;
             _scale =0.1;
+            _models =false;
              _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
    
@@ -511,7 +512,7 @@
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-                    this._carPlaced = false;
+                    this._CarPlaced = false;
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
