@@ -14,12 +14,11 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _controls = null;
             _animationMixers = [];
             _clock = null;
-            _carPlaced = false;
+            _CarPlaced = false;
             _gltfData = [];
             oxSDK;
             _scale =0.1;
              _modelPlaced = false;
-	    _surfacePlaceholder = null; // To hold the surface placeholder
             renderCanvas = null; // Define renderCanvas property
             async init() {
                 try {
@@ -29,8 +28,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
-                    this.createSurfacePlaceholder();
-                    let isRotating = false;
+                    
+                    let isRotating = true;
                     let touchStartAngle = 0;
                     let initialRotationY = 0;
 
@@ -60,17 +59,14 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     this.oxSDK.subscribe(OnirixSDK.Events.OnResize, () => {
                         this.onResize();
                     });
-	            this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-            if (!this._carPlaced) {
-                // Move the placeholder to the detected surface position
-                this._surfacePlaceholder.position.copy(hitResult.position);
-                this._surfacePlaceholder.visible = true; // Ensure the placeholder is visible
-            } else {
-                this._surfacePlaceholder.visible = false; // Hide the placeholder once the car is placed
-            }
-        });		
 
-                
+                    this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
+                        if (this._modelPlaced && !this.isCarPlaced()) {
+                            this._models.forEach((model) => {
+                                model.position.copy(hitResult.position);
+                            });
+                        }
+                    });
 
                     const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
                     const gltfLoader = new GLTFLoader();
@@ -130,39 +126,9 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     throw err;
                 }
             }
-		  createSurfacePlaceholder() {
-				const geometry = new THREE.PlaneGeometry(1, 1); // Adjust size as needed
-				const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 }); // Green color with some transparency
-				this._surfacePlaceholder = new THREE.Mesh(geometry, material);
-				this._surfacePlaceholder.rotation.x = -Math.PI / 2; // Rotate to lay flat
-				this._surfacePlaceholder.position.y = 0.01; // Position slightly above the ground
-				this._scene.add(this._surfacePlaceholder); // Add to the scene
-
-				// Add click event listener for the surface placeholder
-				this._surfacePlaceholder.userData = { interactive: true }; // Mark it as interactive
-				if (this.renderCanvas) { // Check if renderCanvas is not null
-                    this.renderCanvas.addEventListener('click', (event) => this.onSurfacePlaceholderClick(event));
-                } else {
-                    console.error("Render canvas is not initialized.");
-                }
-			}
+		  
 			// Method to handle clicks on the surface placeholder
-			onSurfacePlaceholderClick(event) {
-				// Calculate mouse position in normalized device coordinates
-				const mouse = new THREE.Vector2();
-				mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-				mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-				// Update the raycaster
-				this._raycaster.setFromCamera(mouse, this._camera);
-				
-				// Check for intersections with the surface placeholder
-				const intersects = this._raycaster.intersectObjects([this._surfacePlaceholder]);
-
-				if (intersects.length > 0) {
-					this.enableModel(); // Call to enable the model
-				}
-			}
+			
 			// New method to enable the model
 			enableModel() {
 				if (!this.isCarPlaced()) {
@@ -180,7 +146,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 this.oxSDK.start();
             }
 
-            iscarPlaced() {
+            isCarPlaced() {
                 return this._carPlaced;
             }
 
