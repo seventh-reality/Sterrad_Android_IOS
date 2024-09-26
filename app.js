@@ -14,7 +14,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _controls = null;
             _animationMixers = [];
             _clock = null;
-            _CarPlaced = false;
+            _carPlaced = false;
             _gltfData = [];
             oxSDK;
             _scale =0.1;
@@ -180,7 +180,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 this.oxSDK.start();
             }
 
-            isCarPlaced() {
+            iscarPlaced() {
                 return this._carPlaced;
             }
 
