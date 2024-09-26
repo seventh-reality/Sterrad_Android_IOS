@@ -3,7 +3,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
         import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
         import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
 
-         class OxExperience {
+          class OxExperience {
             _renderer = null;
             _scene = null;
             _camera = null;
@@ -19,7 +19,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _scale =0.1;
              _modelPlaced = false;
 			_surfacePlaceholder = null; // To hold the surface placeholder
-
+            renderCanvas = null; // Define renderCanvas property
             async init() {
                 try {
                     this._raycaster = new THREE.Raycaster();
@@ -28,6 +28,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
+                    this.createSurfacePlaceholder();
                     let isRotating = false;
                     let touchStartAngle = 0;
                     let initialRotationY = 0;
@@ -106,7 +107,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
 
                     this.addLights();
-					this.createSurfacePlaceholder();
+					
                 } catch (err) {
                     console.error("Error initializing OxExperience", err);
                     throw err;
@@ -135,7 +136,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
 
 				// Add click event listener for the surface placeholder
 				this._surfacePlaceholder.userData = { interactive: true }; // Mark it as interactive
-				renderCanvas.addEventListener('click', (event) => this.onSurfacePlaceholderClick(event));
+				this.renderCanvas.addEventListener('click', (event) => this.onSurfacePlaceholderClick(event));
 			}
 			// Method to handle clicks on the surface placeholder
 			onSurfacePlaceholderClick(event) {
