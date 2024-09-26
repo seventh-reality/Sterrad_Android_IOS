@@ -201,18 +201,9 @@
         button {
             margin-right: 10px;
         }
-        #color-controls {
-    position: none;
-    bottom: 25px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    display: none;
-    z-index: 2;
-}
 
-        #transform-controls
-         {
+        #transform-controls,
+        #color-controls {
             display: none;
             position: static;
             top: 20px;
@@ -516,9 +507,7 @@
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-                    const embedSDK = new OnirixEmbedSDK();
-                    await embedSDK.connect();
-                          embedSDK.loadSurfacePlaceholder("https://webar-examples.com/ox-placeholder_bn.png"); 
+
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
@@ -828,7 +817,7 @@
                     this._backbutton = document.querySelector("#back-button");
                     this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
                     this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
-                     
+
                     document.querySelector("#tap-to-place").addEventListener("click", () => {
                          playAudio("Feture.mp3");
                         oxExp.placeCar();
@@ -961,14 +950,14 @@
 
                     });
 
-                } 
-                catch (err) {
+                } catch (err) {
                     console.error("Error initializing UI", err);
                 }
             }
 
             hideLoading() {
                 this._loadingScreen.style.display = "none";
+                this._transformControls.style.display = "block";
             }
 
             showError(title, message) {
@@ -994,19 +983,6 @@
         }
         const oxExp = new OxExperience();
         const oxUI = new OxExperienceUI();
-        oxUI.init();
-try {
-    await oxExp.init();
-
-    oxUI.onPlace(() => { 
-        oxExp.placeCar();
-    })
-    
-    oxExp.onHitTest(() => { 
-        if (!oxExp.isCarPlaced()) {
-            oxUI.showControls();
-        }
-    });
 
         oxExp
             .init()
