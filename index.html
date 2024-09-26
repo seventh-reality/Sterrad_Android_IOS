@@ -507,7 +507,9 @@
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-
+                    const embedSDK = new OnirixEmbedSDK();
+                    await embedSDK.connect();
+                          embedSDK.loadSurfacePlaceholder("https://webar-examples.com/ox-placeholder_bn.png"); 
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
