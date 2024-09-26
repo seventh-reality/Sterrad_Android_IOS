@@ -197,20 +197,30 @@
             transform: translate(-50%, -50%);
             padding: 20px;
         }
+        
 
         button {
             margin-right: 10px;
         }
 
-        #transform-controls,
-        #color-controls {
-            display: none;
+        #transform-controls
+     {
+            display: flex;
             position: static;
             top: 20px;
             left: 20px;
             margin-left: auto;
             margin-right: auto;
         }
+        #color-controls {
+    position: none;
+    bottom: 25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    display: none;
+    z-index: 2;
+}
 
         #loading-screen {
             position: absolute;
@@ -503,19 +513,21 @@
             _gltfData = [];
             oxSDK;
             _scale =0.5;
+            _surfacePlaceholder = null; // Surface placeholder reference
 
             async init() {
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-
+                    this._carPlaced = false;
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
-                    let isRotating = false;
+                    let isRotating = true;
                     let touchStartAngle = 0;
                     let initialRotationY = 0;
-
+                     // Create and add the surface placeholder
+                    this.createSurfacePlaceholder();
                     const textureLoader = new THREE.TextureLoader();
                     this._envMap = textureLoader.load("envmap.jpg");
                     this._envMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -613,6 +625,14 @@
                 this._carPlaced = true;
                 this.oxSDK.start();
             }
+            createSurfacePlaceholder() {
+        const geometry = new THREE.RingGeometry(0.1, 0.2, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+        const ring = new THREE.Mesh(geometry, material);
+        ring.rotation.x = -Math.PI / 2; // Rotate to lie flat on the ground
+        this._scene.add(ring);
+        this._surfacePlaceholder = ring;
+    }
 
             isCarPlaced() {
                 return this._carPlaced;
