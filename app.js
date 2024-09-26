@@ -70,13 +70,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             }
         });		
 
-                    this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                        if (this._modelPlaced && !this.isCarPlaced()) {
-                            this._models.forEach((model) => {
-                                model.position.copy(hitResult.position);
-                            });
-                        }
-                    });
+                
 
                     const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
                     const gltfLoader = new GLTFLoader();
