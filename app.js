@@ -18,8 +18,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _gltfData = [];
             oxSDK;
             _scale =0.1;
-           _modelPlaced = false;
-	   _surfacePlaceholder = null; // To hold the surface placeholder
+             _modelPlaced = false;
+			_surfacePlaceholder = null; // To hold the surface placeholder
             renderCanvas = null; // Define renderCanvas property
             async init() {
                 try {
