@@ -511,7 +511,7 @@
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-
+                    this._carPlaced = false;
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
