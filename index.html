@@ -828,9 +828,7 @@
                     this._backbutton = document.querySelector("#back-button");
                     this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
                     this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
-                     showControls() {
-        this._transformControls.style.display = "block";
-    }
+                     
                     document.querySelector("#tap-to-place").addEventListener("click", () => {
                          playAudio("Feture.mp3");
                         oxExp.placeCar();
@@ -963,7 +961,10 @@
 
                     });
 
-                } catch (err) {
+                } showControls() {
+        this._transformControls.style.display = "block";
+    }
+                catch (err) {
                     console.error("Error initializing UI", err);
                 }
             }
