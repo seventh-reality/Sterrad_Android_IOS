@@ -19,7 +19,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             oxSDK;
             _scale =0.1;
              _modelPlaced = false;
-			_surfacePlaceholder = null; // To hold the surface placeholder
+	    _surfacePlaceholder = null; // To hold the surface placeholder
             renderCanvas = null; // Define renderCanvas property
             async init() {
                 try {
@@ -60,6 +60,15 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     this.oxSDK.subscribe(OnirixSDK.Events.OnResize, () => {
                         this.onResize();
                     });
+	            this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
+            if (!this._carPlaced) {
+                // Move the placeholder to the detected surface position
+                this._surfacePlaceholder.position.copy(hitResult.position);
+                this._surfacePlaceholder.visible = true; // Ensure the placeholder is visible
+            } else {
+                this._surfacePlaceholder.visible = false; // Hide the placeholder once the car is placed
+            }
+        });		
 
                     this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
                         if (this._modelPlaced && !this.isCarPlaced()) {
