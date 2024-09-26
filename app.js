@@ -3,7 +3,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
         import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
         import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
 
-        class OxExperience {
+         class OxExperience {
             _renderer = null;
             _scene = null;
             _camera = null;
@@ -18,7 +18,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             oxSDK;
             _scale =0.1;
              _modelPlaced = false;
-   
+			_surfacePlaceholder = null; // To hold the surface placeholder
 
             async init() {
                 try {
@@ -106,6 +106,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
 
                     this.addLights();
+					this.createSurfacePlaceholder();
                 } catch (err) {
                     console.error("Error initializing OxExperience", err);
                     throw err;
@@ -124,6 +125,46 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     throw err;
                 }
             }
+		  createSurfacePlaceholder() {
+				const geometry = new THREE.PlaneGeometry(1, 1); // Adjust size as needed
+				const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5 }); // Green color with some transparency
+				this._surfacePlaceholder = new THREE.Mesh(geometry, material);
+				this._surfacePlaceholder.rotation.x = -Math.PI / 2; // Rotate to lay flat
+				this._surfacePlaceholder.position.y = 0.01; // Position slightly above the ground
+				this._scene.add(this._surfacePlaceholder); // Add to the scene
+
+				// Add click event listener for the surface placeholder
+				this._surfacePlaceholder.userData = { interactive: true }; // Mark it as interactive
+				renderCanvas.addEventListener('click', (event) => this.onSurfacePlaceholderClick(event));
+			}
+			// Method to handle clicks on the surface placeholder
+			onSurfacePlaceholderClick(event) {
+				// Calculate mouse position in normalized device coordinates
+				const mouse = new THREE.Vector2();
+				mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+				mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+				// Update the raycaster
+				this._raycaster.setFromCamera(mouse, this._camera);
+				
+				// Check for intersections with the surface placeholder
+				const intersects = this._raycaster.intersectObjects([this._surfacePlaceholder]);
+
+				if (intersects.length > 0) {
+					this.enableModel(); // Call to enable the model
+				}
+			}
+			// New method to enable the model
+			enableModel() {
+				if (!this.isCarPlaced()) {
+					this.placeCar(); // Place the car if it hasn't been placed yet
+					this._models.forEach((model) => {
+						this._scene.add(model); // Add all models to the scene
+						model.visible = true; // Ensure the model is visible
+					});
+					this._carPlaced = true; // Mark the car as placed
+				}
+			}
 
             placeCar() {
                 this._carPlaced = true;
@@ -238,16 +279,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
                 }
             }
-
-            // switchModel(index) {
-            //     if (this._currentModel) {
-            //         this._scene.remove(this._currentModel);
-            //     }
-            //     this._currentModel = this._models[index];
-            //     if (this._currentModel) {
-            //         this._scene.add(this._currentModel);
-            //     }
-            // }
             switchModel(index) {
                 // Stop and remove the current model from the scene
                 if (this._currentModel) {
@@ -280,10 +311,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     }
                 }
             }
-            // playAudio(audioFile) {
-            //     const audio = new Audio(audioFile);
-            //     audio.play();
-            // }
         }
         let previousTouch = null;
        function onTouchStart(event) {
