@@ -1,3 +1,4 @@
+
 import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
         import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
         import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
@@ -136,7 +137,11 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
 
 				// Add click event listener for the surface placeholder
 				this._surfacePlaceholder.userData = { interactive: true }; // Mark it as interactive
-				this.renderCanvas.addEventListener('click', (event) => this.onSurfacePlaceholderClick(event));
+				if (this.renderCanvas) { // Check if renderCanvas is not null
+                    this.renderCanvas.addEventListener('click', (event) => this.onSurfacePlaceholderClick(event));
+                } else {
+                    console.error("Render canvas is not initialized.");
+                }
 			}
 			// Method to handle clicks on the surface placeholder
 			onSurfacePlaceholderClick(event) {
