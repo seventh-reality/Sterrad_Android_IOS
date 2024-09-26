@@ -19,7 +19,6 @@ class OxExperience {
     _scale = 0.1;
     _models = false;
     _surfacePlaceholder = null; // Surface placeholder reference
-    _modelPlaced = false;
 
 
     async init() {
@@ -134,10 +133,16 @@ class OxExperience {
 
     placeCar() {
         this._CarPlaced = true;
-        this._models.visible = true; // Show the model when car is placed
-        this._models.position.copy(this._surfacePlaceholder.position); // Move model to placeholder's position
+    
+        // Show all models when car is placed
+        this._models.forEach((model) => {
+            model.visible = true;
+            model.position.copy(this._surfacePlaceholder.position); // Move each model to placeholder's position
+        });
+    
         this.oxSDK.start();
     }
+    
     createSurfacePlaceholder() {
         const geometry = new THREE.RingGeometry(0.1, 0.2, 32);
         const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
