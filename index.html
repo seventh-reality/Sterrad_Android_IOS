@@ -548,7 +548,10 @@
                     });
 
                     this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                        if (!this.isCarPlaced()) {
+                        if (this._modelPlaced && !this.isCarPlaced()) {
+						 this._models.forEach((model) => {
+                                model.position.copy(hitResult.position);
+                            });
 						// Move the placeholder to the detected surface position
 						this._surfacePlaceholder.position.copy(hitResult.position);
 						this._surfacePlaceholder.visible = true; // Ensure the placeholder is visible
