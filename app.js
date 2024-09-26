@@ -1,10 +1,9 @@
-
 import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
         import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
         import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
         import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
 
-          class OxExperience {
+        class OxExperience {
             _renderer = null;
             _scene = null;
             _camera = null;
@@ -18,8 +17,11 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _gltfData = [];
             oxSDK;
             _scale =0.1;
+            _models =false;
+             _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
-            renderCanvas = null; // Define renderCanvas property
+   
+
             async init() {
                 try {
                     this._raycaster = new THREE.Raycaster();
@@ -28,8 +30,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
-                    
-                    let isRotating = true;
+                    let isRotating = false;
                     let touchStartAngle = 0;
                     let initialRotationY = 0;
 
@@ -107,7 +108,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
 
                     this.addLights();
-					
                 } catch (err) {
                     console.error("Error initializing OxExperience", err);
                     throw err;
@@ -126,20 +126,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     throw err;
                 }
             }
-		  
-			// Method to handle clicks on the surface placeholder
-			
-			// New method to enable the model
-			enableModel() {
-				if (!this.isCarPlaced()) {
-					this.placeCar(); // Place the car if it hasn't been placed yet
-					this._models.forEach((model) => {
-						this._scene.add(model); // Add all models to the scene
-						model.visible = true; // Ensure the model is visible
-					});
-					this._carPlaced = true; // Mark the car as placed
-				}
-			}
 
             placeCar() {
                 this._carPlaced = true;
@@ -254,6 +240,16 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
                 }
             }
+
+            // switchModel(index) {
+            //     if (this._currentModel) {
+            //         this._scene.remove(this._currentModel);
+            //     }
+            //     this._currentModel = this._models[index];
+            //     if (this._currentModel) {
+            //         this._scene.add(this._currentModel);
+            //     }
+            // }
             switchModel(index) {
                 // Stop and remove the current model from the scene
                 if (this._currentModel) {
@@ -286,6 +282,10 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     }
                 }
             }
+            // playAudio(audioFile) {
+            //     const audio = new Audio(audioFile);
+            //     audio.play();
+            // }
         }
         let previousTouch = null;
        function onTouchStart(event) {
