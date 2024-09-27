@@ -25,6 +25,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
                     this._carPlaced = false;
+                    this._modelPlaced= false;    
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
