@@ -270,12 +270,12 @@ window.app.init();
                         }, 9999);
                     }
                 }
-            }
+            
             // playAudio(audioFile) {
             //     const audio = new Audio(audioFile);
             //     audio.play();
             // }
-        }
+        
         let previousTouch = null;
        function onTouchStart(event) {
             if (event.touches.length === 1) {
