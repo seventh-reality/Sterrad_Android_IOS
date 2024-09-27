@@ -13,11 +13,12 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _controls = null;
             _animationMixers = [];
             _clock = null;
-            _carPlaced = false;
+            _CarPlaced = false;
             _gltfData = [];
             oxSDK;
             _scale =0.1;
             _models =false;
+             _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
    
 
@@ -25,7 +26,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-                    this._carPlaced = false;
+                    this._CarPlaced = false;
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
@@ -37,8 +38,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     this._envMap = textureLoader.load("envmap.jpg");
                     this._envMap.mapping = THREE.EquirectangularReflectionMapping;
                     this._envMap.encoding = THREE.sRGBEncoding;
-                
-    
 
                     this.oxSDK.subscribe(OnirixSDK.Events.OnFrame, () => {
                         try {
@@ -83,8 +82,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                                         child.material.needsUpdate = true;
                                     }
                                 });
-                                  this._scene.scale.set(0.5, 0.5, 0.5);
-                                  this._scene.visible = false;   
+
                                 if (gltf.animations && gltf.animations.length) {
                                     const mixer = new THREE.AnimationMixer(model);
                                     gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
@@ -131,10 +129,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
 
             placeCar() {
                 this._carPlaced = true;
-                this._model.visible = true; // Show the model when car is placed
-                this._model.position.copy(this._surfacePlaceholder.position); // Move model to placeholder's position    
                 this.oxSDK.start();
-            }    
+            }
 
             isCarPlaced() {
                 return this._carPlaced;
