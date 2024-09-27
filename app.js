@@ -95,7 +95,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                                     }
                                 });
                                   this._scene.scale.set(0.5, 0.5, 0.5);
-                                  this._scene.visible = false;   
+                                    
                                 if (gltf.animations && gltf.animations.length) {
                                     const mixer = new THREE.AnimationMixer(model);
                                     gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
