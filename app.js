@@ -17,10 +17,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _gltfData = [];
             oxSDK;
             _scale =0.1; 
-             _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
-   
-
             async init() {
                 try {
                     this._raycaster = new THREE.Raycaster();
@@ -239,16 +236,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
                 }
             }
-
-            // switchModel(index) {
-            //     if (this._currentModel) {
-            //         this._scene.remove(this._currentModel);
-            //     }
-            //     this._currentModel = this._models[index];
-            //     if (this._currentModel) {
-            //         this._scene.add(this._currentModel);
-            //     }
-            // }
             switchModel(index) {
                 // Stop and remove the current model from the scene
                 if (this._currentModel) {
@@ -260,8 +247,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                         currentMixer.stopAllAction();
                     }
                 }
-
-                // Set the new model as the current model
                 this._currentModel = this._models[index];
                 if (this._currentModel) {
                     this._scene.add(this._currentModel);
@@ -281,10 +266,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     }
                 }
             }
-            // playAudio(audioFile) {
-            //     const audio = new Audio(audioFile);
-            //     audio.play();
-            // }
         }
         let previousTouch = null;
        function onTouchStart(event) {
@@ -298,12 +279,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 const touch = event.touches[0];
                 const deltaX = touch.clientX - previousTouch.x;
                 const deltaY = touch.clientY - previousTouch.y;
-
-                // Update cube rotation based on touch movement
                 cube.rotation.y += deltaX * 0.01; // Adjust sensitivity as needed
                 cube.rotation.x += deltaY * 0.01;
-
-                // Update previous touch position
                 previousTouch = { x: touch.clientX, y: touch.clientY };
             }
         }
