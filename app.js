@@ -236,7 +236,7 @@ class OxExperience {
         audio.play();
     }
 
-    switchModel() {
+    switchModel(index) {
         if (this._gltfData.length > 0) {
             this._currentModel.visible = false;
             this._modelIndex = (this._modelIndex + 1) % this._gltfData.length;
@@ -249,18 +249,7 @@ class OxExperience {
 window.app = new OxExperience();
 window.app.init();
 
-            switchModel(index) {
-                // Stop and remove the current model from the scene
-                if (this._currentModel) {
-                    this._scene.remove(this._currentModel);
-
-                    // Stop all animations of the current model
-                    const currentMixer = this._animationMixers[index];
-                    if (currentMixer) {
-                        currentMixer.stopAllAction();
-                    }
-                }
-            }
+           
 
                 // Set the new model as the current model
                 this._currentModel = this._models[index];
