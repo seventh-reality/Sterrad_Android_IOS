@@ -489,6 +489,10 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     console.error("Error initializing UI", err);
                 }
             }
+             onPlace(listener) {
+        this._placeButton.addEventListener('click', listener);
+             }
+    
 
             hideLoading() {
                 this._loadingScreen.style.display = "none";
