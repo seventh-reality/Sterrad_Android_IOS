@@ -16,9 +16,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _carPlaced = false;
             _gltfData = [];
             oxSDK;
-            _scale =0.1;
-             _surfacePlaceholder = null; // Surface placeholder reference
-             _modelPlaced = false;
+            _scale =0.1; 
+            _modelPlaced = false;
    
 
             async init() {
@@ -37,8 +36,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     this._envMap = textureLoader.load("envmap.jpg");
                     this._envMap.mapping = THREE.EquirectangularReflectionMapping;
                     this._envMap.encoding = THREE.sRGBEncoding;
-                     // Create and add the surface placeholder
-                    this.createSurfacePlaceholder();
+             
     
 
                     this.oxSDK.subscribe(OnirixSDK.Events.OnFrame, () => {
@@ -65,13 +63,14 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                         
                     this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
             if (!this._carPlaced) {
-                // Move the placeholder to the detected surface position
-                this._surfacePlaceholder.position.copy(hitResult.position);
-                this._surfacePlaceholder.visible = true; // Ensure the placeholder is visible
-            } else {
-                this._surfacePlaceholder.visible = false; // Hide the placeholder once the car is placed
-            }
-        });
+                
+               this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
+                        if (this._modelPlaced && !this.isCarPlaced()) {
+                            this._models.forEach((model) => {
+                                model.position.copy(hitResult.position);
+                            });
+                        }
+                    });
 
                     const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
                     const gltfLoader = new GLTFLoader();
@@ -134,20 +133,9 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
 
             placeCar() {
                 this._carPlaced = true;
-                this._model.visible = true; // Show the model when car is placed
-                this._model.position.copy(this._surfacePlaceholder.position); // Move model to placeholder's position    
                 this.oxSDK.start();
             }
-             createSurfacePlaceholder() {
-        const geometry = new THREE.RingGeometry(0.1, 0.2, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
-        const ring = new THREE.Mesh(geometry, material);
-        ring.rotation.x = -Math.PI / 2; // Rotate to lie flat on the ground
-        ring.userData.isPlaceholder = true; // Add a flag for detecting click
-        this._scene.add(ring);
-        this._surfacePlaceholder = ring;
-    }     
-
+             
             isCarPlaced() {
                 return this._carPlaced;
             }
@@ -489,9 +477,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     console.error("Error initializing UI", err);
                 }
             }
-             onPlace(listener) {
-        this._placeButton.addEventListener('click', listener);
-             }
     
 
             hideLoading() {
