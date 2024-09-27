@@ -13,7 +13,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _controls = null;
             _animationMixers = [];
             _clock = null;
-            _CarPlaced = false;
+            _carPlaced = false;
             _gltfData = [];
             oxSDK;
             _scale =0.1;
@@ -24,7 +24,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-                    this._CarPlaced = false;
+                    this._carPlaced = false;
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
@@ -60,7 +60,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
 
                     this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                        if (this._modelPlaced && !this.isCarPlaced()) {
+                        if (this._modelPlaced && !this.iscarPlaced()) {
                             this._models.forEach((model) => {
                                 model.position.copy(hitResult.position);
                             });
