@@ -254,6 +254,7 @@ experience.init();
                         currentMixer.stopAllAction();
                     }
                 }
+            }
 
                 // Set the new model as the current model
                 this._currentModel = this._models[index];
