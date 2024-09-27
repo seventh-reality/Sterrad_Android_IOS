@@ -220,29 +220,35 @@ class OxExperience {
     }
 
     changeModelsColor(value) {
-        if (this._currentModel) {
-            this._currentModel.traverse((child) => {
-                if (child.isMesh) {
+        if (this._models.length === 0) return;
+        this._models.forEach((model) => {
+            model.traverse((child) => {
+                if (child.material) {
                     child.material.color.set(value);
+                    child.material.needsUpdate = true;
                 }
             });
+        });
+    }
+
+    playAudio() {
+        var audio = new Audio("audio.mp3");
+        audio.play();
+    }
+
+    switchModel() {
+        if (this._gltfData.length > 0) {
+            this._currentModel.visible = false;
+            this._modelIndex = (this._modelIndex + 1) % this._gltfData.length;
+            this._currentModel = this._gltfData[this._modelIndex].scene;
+            this._currentModel.visible = true;
         }
     }
 }
 
-window.experience = new OxExperience();
-experience.init();
+window.app = new OxExperience();
+window.app.init();
 
-
-            // switchModel(index) {
-            //     if (this._currentModel) {
-            //         this._scene.remove(this._currentModel);
-            //     }
-            //     this._currentModel = this._models[index];
-            //     if (this._currentModel) {
-            //         this._scene.add(this._currentModel);
-            //     }
-            // }
             switchModel(index) {
                 // Stop and remove the current model from the scene
                 if (this._currentModel) {
