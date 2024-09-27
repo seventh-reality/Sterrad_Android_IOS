@@ -1,255 +1,752 @@
-import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
-import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
-import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
-import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
+<!DOCTYPE html>
+<html lang="en">
 
-class OxExperience {
-    _renderer = null;
-    _scene = null;
-    _camera = null;
-    _models = [];
-    _modelIndex = 0;
-    _currentModel = null;
-    _controls = null;
-    _animationMixers = [];
-    _clock = null;
-    _carPlaced = false;
-    _gltfData = [];
-    oxSDK;
-    _scale = 0.1;
-    _modelPlaced = false;
-    _surfacePlaceholder = null; // Placeholder for surface
-    _placeholderVisible = true;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js and OnirixSDK Example</title>
+    <style>
+        #logoo {
+            scale: .6;
+        }
 
-    async init() {
-        try {
-            this._raycaster = new THREE.Raycaster();
-            this._clock = new THREE.Clock(true);
-            this._carPlaced = false;
-            const renderCanvas = await this.initSDK();
-            this.setupRenderer(renderCanvas);
-            this.setupControls(renderCanvas);
+        #logooo {
+            scale: .6;
+            transform: translate(0%, 0%);
+        }
+         #ins7 {   
+            display: none;
+            transform: translate(0%, 0%);
+        }
 
-            const textureLoader = new THREE.TextureLoader();
-            this._envMap = textureLoader.load("envmap.jpg");
-            this._envMap.mapping = THREE.EquirectangularReflectionMapping;
-            this._envMap.encoding = THREE.sRGBEncoding;
+        #ins1:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
 
-            this.oxSDK.subscribe(OnirixSDK.Events.OnFrame, () => {
-                const delta = this._clock.getDelta();
-                this._animationMixers.forEach((mixer) => mixer.update(delta));
-                this.render();
-            });
+        #ins2:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
 
-            this.oxSDK.subscribe(OnirixSDK.Events.OnPose, (pose) => {
-                this.updatePose(pose);
-            });
+        #ins3:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
 
-            this.oxSDK.subscribe(OnirixSDK.Events.OnResize, () => {
-                this.onResize();
-            });
+        #ins4:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
+        #ins7:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
 
-            this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                if (!this._modelPlaced && this._surfacePlaceholder) {
-                    // Move the placeholder to hit result position
-                    this._surfacePlaceholder.position.copy(hitResult.position);
-                    this._surfacePlaceholder.visible = true;
+        #ins5:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
+
+        #ins6:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
+
+        #back:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
+
+        #model1:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
+
+        #model2:hover {
+            background-color: #92cfc2;
+            border-radius: 5px;
+        }
+
+        button3.disabled {
+            background-color: #92cfc2;
+        }
+
+        button1.disabled {
+            background-color: #92cfc2;
+        }
+
+        button2.disabled {
+            background-color: #92cfc2;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            /* Distributes space between items */
+            align-items: center;
+            /* Centers items vertically if they have different heights */
+            padding: 10px;
+            /* Optional: adds padding around the container */
+        }
+
+        .container1 {
+            
+            height: 140px;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #insidebuttons-controls {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-52%, 300%);
+            padding: 20px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        #insidebuttons-controls1 {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-52%, 300%);
+            padding: 20px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        #back {
+
+            background-color: unset;
+            border: 0;
+            scale: .9;
+        }
+
+        #back-button {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-165%, 250%);
+            padding: 20px;
+            margin: auto;
+            padding: 25px;
+        }
+        #errorimg {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        #model-controls {
+            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, 860%);
+            padding: 20px;
+            margin: auto;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #model1 {
+            background-color: #FFFFFF00;
+            border: 0;
+        }
+
+        #model2 {
+            background-color: #FFFFFF00;
+            border: 0;
+        }
+
+        #model3 {
+            background-color: #FFFFFF00;
+            border: 0;
+        }
+
+        #tap-to-place {
+            display: block;
+            margin: auto;
+            width: 200px;
+            padding: 21px;
+            background-color: #231532;
+            color: #FFFFFF;
+            border: 0;
+            border-radius: 20px;
+            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+        }
+
+        button {
+            margin-right: 10px;
+        }
+
+        #transform-controls,
+        #color-controls {
+            display: none;
+            position: static;
+            top: 20px;
+            left: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #loading-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #error-screen {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #ins1 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
+
+        #ins2 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
+
+        #ins3 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
+
+        #ins4 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
+        #ins7 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
+
+        #ins5 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
+
+        #ins6 {
+            background-color: #FFFFFF00;
+            border: 0;
+            scale: .9;
+        }
+
+        #one {
+            display: none;
+            scale: .7;
+        }
+
+        #two {
+            display: none;
+            scale: .7;
+        }
+
+        #three {
+            display: none;
+            scale: .7;
+        }
+
+        @media only screen and (max-width: 600px) {
+            #errorimg {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -80%);
+            padding: 20px;
+            margin: auto;
+            padding: 25px;
+        }
+            #model-controls {
+                display: none;
+                position: absolute;
+                left: 50%;
+                transform: translate(-48%, 750%);
+                padding: 20px;
+                margin: auto;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #insidebuttons-controls {
+                display: none;
+                position: static;
+                top: 50%;
+                left: 50%;
+                transform: translate(5%, 575%);
+                padding: 20px;
+                margin: auto;
+                padding: 25px;
+
+            }
+
+            #insidebuttons-controls1 {
+                display: none;
+                position: static;
+                top: 50%;
+                left: 50%;
+                transform: translate(5%, 575%);
+                padding: 20px;
+                margin: auto;
+                padding: 25px;
+
+            }
+
+            #logooo {
+                scale: .6;
+                transform: translate(20%, -20%);
+            }
+
+            #logoo {
+                scale: .6;
+                transform: translate(-20%, -20%);
+            }
+
+            #back-button {
+                display: none;
+                position: static;
+                top: 50%;
+                left: 50%;
+                transform: translate(5%, 625%);
+                padding: 20px;
+                margin: auto;
+                padding: 25px;
+            }
+
+            #model1 {
+                background-color: #FFFFFF00;
+                border: 0;
+
+            }
+
+            #model2 {
+                background-color: #FFFFFF00;
+                border: 0;
+
+            }
+
+            .container {
+                display: flex;
+                justify-content: space-between;
+                /* Distributes space between items */
+                align-items: center;
+                /* Centers items vertically if they have different heights */
+                padding: 10px;
+                /* Optional: adds padding around the container */
+            }
+
+            .container1 {
+                
+                height: 81px;
+            }
+        }
+
+        /* For tablets (iPad and similar) */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            #model-controls {
+                display: none;
+                position: absolute;
+                left: 50%;
+                transform: translate(-45%, 450%);
+                padding: 20px;
+                margin: auto;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #insidebuttons-controls {
+                display: none;
+                position: static;
+                top: 50%;
+                left: 50%;
+                transform: translate(15%, 370%);
+                padding: 20px;
+                margin: auto;
+                padding: 25px;
+
+            }
+
+            #model1 {
+                background-color: #FFFFFF00;
+                border: 0;
+                scale: .7;
+            }
+
+            #model2 {
+                background-color: #FFFFFF00;
+                border: 0;
+                scale: .7;
+            }
+
+            #back-button {
+                display: none;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-170%, 60%);
+                padding: 20px;
+                margin: auto;
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <audio autoplay>
+        <source src="Background_Music.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    <audio id="audioPlayer" preload="auto"></audio>
+
+    <div id="transform-controls">
+        <button id="tap-to-place">Place Model</button>
+    </div>
+    <div id="color-controls">
+        <button id="black">Black</button>
+        <button id="blue">Blue</button>
+        <button id="orange">Orange</button>
+        <button id="silver">Silver</button>
+    </div>
+    <div id="back-button">
+        <button id="back"><img src="Back.png" style="width:32.6px;height:37.8px;"></button>
+    </div>
+    <div id="errorimg">
+        <img id="back"><img src="Game_over_close_button.png" style="width:225px;height:214px;"></img>
+    </div>
+    <div id="model-controls">
+        <button id="model1"><img src="what.png" style="width:130px;height:40px; "></button>
+        <button id="model2"><img src="why.png" style="width:130px;height:40px;"></button>
+    </div>
+    <div id="insidebuttons-controls">
+        <button id="ins1"><img src="intro.png" style="width:72px;height:40px;"></button>
+        <button id="ins2"><img src="parts.png" style="width:72px;height:40px;"></button>
+        <button id="ins3"><img src="usage.png" style="width:72px;height:40px;"></button>
+    </div>
+     
+    <div id="insidebuttons-controls1">
+        <button id="ins5"><img src="usp2.png" style="width:72px;height:40px;"></button>
+        <button id="ins7"><img src="usp1.png" style="width:72px;height:40px;"></button>
+        <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button>
+        <button id="ins6"><img src="usp3.png" style="width:72px;height:40px;"></button>
+        
+    </div>
+    <div id="loading-screen">Loading...</div>
+    <div id="error-screen">
+        <div id="error-title"></div>
+        <div id="error-message"></div>
+    </div>
+
+    <script type="module">
+        import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
+        import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
+        import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
+        import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
+
+        class OxExperience {
+            _renderer = null;
+            _scene = null;
+            _camera = null;
+            _models = [];
+            _modelIndex = 0;
+            _currentModel = null;
+            _controls = null;
+            _animationMixers = [];
+            _clock = null;
+            _CarPlaced = false;
+            _gltfData = [];
+            oxSDK;
+            _scale =0.1;
+            _models =false;
+             _surfacePlaceholder = null; // Surface placeholder reference
+             _modelPlaced = false;
+   
+
+            async init() {
+                try {
+                    this._raycaster = new THREE.Raycaster();
+                    this._clock = new THREE.Clock(true);
+                    this._CarPlaced = false;
+                    const renderCanvas = await this.initSDK();
+                    this.setupRenderer(renderCanvas);
+                    this.setupControls(renderCanvas);
+                    let isRotating = false;
+                    let touchStartAngle = 0;
+                    let initialRotationY = 0;
+
+                    const textureLoader = new THREE.TextureLoader();
+                    this._envMap = textureLoader.load("envmap.jpg");
+                    this._envMap.mapping = THREE.EquirectangularReflectionMapping;
+                    this._envMap.encoding = THREE.sRGBEncoding;
+
+                    this.oxSDK.subscribe(OnirixSDK.Events.OnFrame, () => {
+                        try {
+                            const delta = this._clock.getDelta();
+                            this._animationMixers.forEach((mixer) => mixer.update(delta));
+                            this.render();
+                        } catch (err) {
+                            console.error("Error during frame update", err);
+                        }
+                    });
+
+                    this.oxSDK.subscribe(OnirixSDK.Events.OnPose, (pose) => {
+                        try {
+                            this.updatePose(pose);
+                        } catch (err) {
+                            console.error("Error updating pose", err);
+                        }
+                    });
+
+                    this.oxSDK.subscribe(OnirixSDK.Events.OnResize, () => {
+                        this.onResize();
+                    });
+
+                    this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
+                        if (this._modelPlaced && !this.isCarPlaced()) {
+                            this._models.forEach((model) => {
+                                model.position.copy(hitResult.position);
+                            });
+                        }
+                    });
+
+                    const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
+                    const gltfLoader = new GLTFLoader();
+                    modelsToLoad.forEach((modelUrl, index) => {
+                        gltfLoader.load(modelUrl, (gltf) => {
+                            try {
+                                const model = gltf.scene;
+
+                                model.traverse((child) => {
+                                    if (child.material) {
+                                        child.material.envMap = this._envMap;
+                                        child.material.needsUpdate = true;
+                                    }
+                                });
+
+                                if (gltf.animations && gltf.animations.length) {
+                                    const mixer = new THREE.AnimationMixer(model);
+                                    gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+                                    this._animationMixers.push(mixer);
+
+                                    setTimeout(() => {
+                                        mixer.stopAllAction();
+                                    }, 9999);
+                                }
+                                this._gltfData[index] = gltf;
+                                this._models[index] = model;
+                                if (index === 0) {
+                                    this._currentModel = model;
+                                    this._modelPlaced = true;
+                                    this._scene.add(model);
+                                }
+                            } catch (err) {
+                                console.error("Error loading model", err);
+                            }
+                        }, undefined, (error) => {
+                            console.error("Model loading error", error);
+                        });
+                    });
+
+                    this.addLights();
+                } catch (err) {
+                    console.error("Error initializing OxExperience", err);
+                    throw err;
                 }
-            });
-
-            this.addLights();
-            this.addSurfacePlaceholder(); // Add surface placeholder
-
-            this.loadModels();
-        } catch (err) {
-            console.error("Error initializing OxExperience", err);
-            throw err;
-        }
-    }
-
-    async initSDK() {
-        try {
-            this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
-            const config = {
-                mode: OnirixSDK.TrackingMode.Surface,
-            };
-            return this.oxSDK.init(config);
-        } catch (err) {
-            console.error("Error initializing Onirix SDK", err);
-            throw err;
-        }
-    }
-
-    addSurfacePlaceholder() {
-        // Create a placeholder to show where the user can click to place the model
-        const geometry = new THREE.CircleGeometry(0.1, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        this._surfacePlaceholder = new THREE.Mesh(geometry, material);
-        this._surfacePlaceholder.rotation.x = -Math.PI / 2; // Align with the surface
-        this._surfacePlaceholder.visible = true; // Initially visible
-        this._scene.add(this._surfacePlaceholder);
-
-        // Add event listener for clicking on the placeholder
-        this._renderer.domElement.addEventListener("click", (event) => {
-            this.onCanvasClick(event);
-        });
-    }
-
-    onCanvasClick(event) {
-        if (this._placeholderVisible) {
-            const mouse = new THREE.Vector2();
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            this._raycaster.setFromCamera(mouse, this._camera);
-            const intersects = this._raycaster.intersectObject(this._surfacePlaceholder);
-            if (intersects.length > 0) {
-                this.placeCar();
             }
-        }
-    }
 
-    placeCar() {
-        if (!this._modelPlaced) {
-            this._modelPlaced = true;
-            this._surfacePlaceholder.visible = false; // Hide the placeholder after placing
-            this._placeholderVisible = false;
-            if (this._currentModel) {
-                this._currentModel.visible = true; // Make model visible
+            async initSDK() {
+                try {
+                    this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
+                    const config = {
+                        mode: OnirixSDK.TrackingMode.Surface,
+                    };
+                    return this.oxSDK.init(config);
+                } catch (err) {
+                    console.error("Error initializing Onirix SDK", err);
+                    throw err;
+                }
             }
-            this.oxSDK.start();
-        }
-    }
 
-    setupRenderer(renderCanvas) {
-        const width = renderCanvas.width;
-        const height = renderCanvas.height;
-
-        this._renderer = new THREE.WebGLRenderer({ canvas: renderCanvas, alpha: true });
-        this._renderer.setClearColor(0x000000, 0);
-        this._renderer.setSize(width, height);
-        this._renderer.outputEncoding = THREE.sRGBEncoding;
-
-        const cameraParams = this.oxSDK.getCameraParameters();
-        this._camera = new THREE.PerspectiveCamera(cameraParams.fov, cameraParams.aspect, 0.1, 1000);
-        this._camera.matrixAutoUpdate = false;
-
-        this._scene = new THREE.Scene();
-
-        const ambientLight = new THREE.AmbientLight(0x666666, 0.5);
-        this._scene.add(ambientLight);
-    }
-
-    addLights() {
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(5, 10, 7.5);
-        directionalLight.castShadow = true;
-        this._scene.add(directionalLight);
-
-        const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-        pointLight.position.set(5, 10, 5);
-        this._scene.add(pointLight);
-    }
-
-    setupControls(renderCanvas) {
-        this._controls = new OrbitControls(this._camera, renderCanvas);
-        this._controls.enableDamping = true;
-        this._controls.dampingFactor = 0.25;
-        this._controls.enableZoom = true;
-        this._controls.enableRotate = true;
-        this._controls.enablePan = false;
-
-        renderCanvas.addEventListener('touchstart', (event) => {
-            if (event.touches.length === 2) {
-                this._controls.enablePan = false;
+            placeCar() {
+                this._carPlaced = true;
+                this.oxSDK.start();
             }
-        });
 
-        renderCanvas.addEventListener('touchend', () => {
-            this._controls.enablePan = false;
-        });
-    }
+            isCarPlaced() {
+                return this._carPlaced;
+            }
 
-    loadModels() {
-        const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
-        const gltfLoader = new GLTFLoader();
-        modelsToLoad.forEach((modelUrl, index) => {
-            gltfLoader.load(modelUrl, (gltf) => {
-                const model = gltf.scene;
-                model.traverse((child) => {
-                    if (child.material) {
-                        child.material.envMap = this._envMap;
-                        child.material.needsUpdate = true;
+            setupRenderer(renderCanvas) {
+                try {
+                    const width = renderCanvas.width;
+                    const height = renderCanvas.height;
+
+                    this._renderer = new THREE.WebGLRenderer({ canvas: renderCanvas, alpha: true });
+                    this._renderer.setClearColor(0x000000, 0);
+                    this._renderer.setSize(width, height);
+                    this._renderer.outputEncoding = THREE.sRGBEncoding;
+
+                    const cameraParams = this.oxSDK.getCameraParameters();
+                    this._camera = new THREE.PerspectiveCamera(cameraParams.fov, cameraParams.aspect, 0.1, 1000);
+                    this._camera.matrixAutoUpdate = false;
+
+                    this._scene = new THREE.Scene();
+
+                    const ambientLight = new THREE.AmbientLight(0x666666, 0.5);
+                    this._scene.add(ambientLight);
+                } catch (err) {
+                    console.error("Error setting up renderer", err);
+                }
+            }
+
+            addLights() {
+                try {
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                    directionalLight.position.set(5, 10, 7.5);
+                    directionalLight.castShadow = true;
+                    this._scene.add(directionalLight);
+
+                    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+                    pointLight.position.set(5, 10, 5);
+                    this._scene.add(pointLight);
+                } catch (err) {
+                    console.error("Error adding lights", err);
+                }
+            }
+
+            setupControls(renderCanvas) {
+                try {
+                    this._controls = new OrbitControls(this._camera, renderCanvas);
+                    this._controls.enableDamping = true;
+                    this._controls.dampingFactor = 0.25;
+                    this._controls.enableZoom = true;
+                    this._controls.enableRotate = true;
+                    this._controls.enablePan = false;
+
+                    renderCanvas.addEventListener('touchstart', (event) => {
+                        if (event.touches.length === 2) {
+                            this._controls.enablePan = false;
+                        }
+                    });
+
+                    renderCanvas.addEventListener('touchend', () => {
+                        this._controls.enablePan = false;
+                    });
+                } catch (err) {
+                    console.error("Error setting up controls", err);
+                }
+            }
+
+            render() {
+                try {
+                    this._controls.update();
+                    this._renderer.render(this._scene, this._camera);
+                } catch (err) {
+                    console.error("Error during rendering", err);
+                }
+            }
+
+            updatePose(pose) {
+                try {
+                    let modelViewMatrix = new THREE.Matrix4();
+                    modelViewMatrix = modelViewMatrix.fromArray(pose);
+                    this._camera.matrix = modelViewMatrix;
+                    this._camera.matrixWorldNeedsUpdate = true;
+                } catch (err) {
+                    console.error("Error updating pose", err);
+                }
+            }
+
+            onResize() {
+                try {
+                    const width = this._renderer.domElement.width;
+                    const height = this._renderer.domElement.height;
+                    const cameraParams = this.oxSDK.getCameraParameters();
+                    this._camera.fov = cameraParams.fov;
+                    this._camera.aspect = cameraParams.aspect;
+                    this._camera.updateProjectionMatrix();
+                    this._renderer.setSize(width, height);
+                } catch (err) {
+                    console.error("Error handling resize", err);
+                }
+            }
+
+            changeModelsColor(value) {
+                if (this._currentModel) {
+                    this._currentModel.traverse((child) => {
+                        if (child.material) {
+                            child.material.color.setHex(value);
+                        }
+                    });
+                }
+            }
+
+            // switchModel(index) {
+            //     if (this._currentModel) {
+            //         this._scene.remove(this._currentModel);
+            //     }
+            //     this._currentModel = this._models[index];
+            //     if (this._currentModel) {
+            //         this._scene.add(this._currentModel);
+            //     }
+            // }
+            switchModel(index) {
+                // Stop and remove the current model from the scene
+                if (this._currentModel) {
+                    this._scene.remove(this._currentModel);
+
+                    // Stop all animations of the current model
+                    const currentMixer = this._animationMixers[index];
+                    if (currentMixer) {
+                        currentMixer.stopAllAction();
                     }
-                });
-
-                // Initially set the model to invisible
-                model.visible = false;
-
-                if (index === 0) {
-                    this._currentModel = model;
                 }
-                this._gltfData[index] = gltf;
-                this._models[index] = model;
-                this._scene.add(model);
-            }, undefined, (error) => {
-                console.error("Model loading error", error);
-            });
-        });
-    }
-
-    render() {
-        this._controls.update();
-        this._renderer.render(this._scene, this._camera);
-    }
-
-    updatePose(pose) {
-        let modelViewMatrix = new THREE.Matrix4();
-        modelViewMatrix = modelViewMatrix.fromArray(pose);
-        this._camera.matrix = modelViewMatrix;
-        this._camera.matrixWorldNeedsUpdate = true;
-    }
-
-    onResize() {
-        const width = this._renderer.domElement.width;
-        const height = this._renderer.domElement.height;
-        const cameraParams = this.oxSDK.getCameraParameters();
-        this._camera.fov = cameraParams.fov;
-        this._camera.aspect = cameraParams.aspect;
-        this._camera.updateProjectionMatrix();
-        this._renderer.setSize(width, height);
-    }
-
-    changeModelsColor(value) {
-        if (this._models.length === 0) return;
-        this._models.forEach((model) => {
-            model.traverse((child) => {
-                if (child.material) {
-                    child.material.color.set(value);
-                    child.material.needsUpdate = true;
-                }
-            });
-        });
-    }
-
-    playAudio() {
-        var audio = new Audio("audio.mp3");
-        audio.play();
-    }
-
-    switchModel(index) {
-        if (this._gltfData.length > 0) {
-            this._currentModel.visible = false;
-            this._modelIndex = (this._modelIndex + 1) % this._gltfData.length;
-            this._currentModel = this._gltfData[this._modelIndex].scene;
-            this._currentModel.visible = true;
-        }
-    }
-}
-
-window.app = new OxExperience();
-window.app.init();
-
-           
 
                 // Set the new model as the current model
                 this._currentModel = this._models[index];
@@ -270,12 +767,12 @@ window.app.init();
                         }, 9999);
                     }
                 }
-            
+            }
             // playAudio(audioFile) {
             //     const audio = new Audio(audioFile);
             //     audio.play();
             // }
-        
+        }
         let previousTouch = null;
        function onTouchStart(event) {
             if (event.touches.length === 1) {
@@ -502,3 +999,7 @@ window.app.init();
                 console.error("Error initializing Onirix SDK", error);
                 oxUI.showError("Initialization Error", error.message);
             });
+    </script>
+</body>
+
+</html>
