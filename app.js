@@ -18,8 +18,9 @@ class OxExperience {
     oxSDK;
     _scale = 0.1;
     _modelPlaced = false;
-    _surfacePlaceholder = null;
-    
+    _surfacePlaceholder = null; // Placeholder for surface
+    _placeholderVisible = true;
+
     async init() {
         try {
             this._raycaster = new THREE.Raycaster();
@@ -28,7 +29,7 @@ class OxExperience {
             const renderCanvas = await this.initSDK();
             this.setupRenderer(renderCanvas);
             this.setupControls(renderCanvas);
-            
+
             const textureLoader = new THREE.TextureLoader();
             this._envMap = textureLoader.load("envmap.jpg");
             this._envMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -49,18 +50,17 @@ class OxExperience {
             });
 
             this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                if (!this._modelPlaced) {
+                if (!this._modelPlaced && this._surfacePlaceholder) {
+                    // Move the placeholder to hit result position
                     this._surfacePlaceholder.position.copy(hitResult.position);
+                    this._surfacePlaceholder.visible = true;
                 }
             });
 
-            // Create the surface placeholder for tap placement
-            this.createSurfacePlaceholder();
-
-            // Load models and wait for placeholder click to display them
-            this.loadModels();
-
             this.addLights();
+            this.addSurfacePlaceholder(); // Add surface placeholder
+
+            this.loadModels();
         } catch (err) {
             console.error("Error initializing OxExperience", err);
             throw err;
@@ -80,61 +80,44 @@ class OxExperience {
         }
     }
 
-    createSurfacePlaceholder() {
-        const geometry = new THREE.PlaneGeometry(0.3, 0.3); // Create a small square plane
-        const material = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
+    addSurfacePlaceholder() {
+        // Create a placeholder to show where the user can click to place the model
+        const geometry = new THREE.CircleGeometry(0.1, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
         this._surfacePlaceholder = new THREE.Mesh(geometry, material);
-        this._surfacePlaceholder.rotation.x = -Math.PI / 2; // Rotate to make it horizontal
-        this._surfacePlaceholder.visible = true; // Ensure the placeholder is visible initially
-        this._scene.add(this._surfacePlaceholder); // Add placeholder to scene
-    }
+        this._surfacePlaceholder.rotation.x = -Math.PI / 2; // Align with the surface
+        this._surfacePlaceholder.visible = true; // Initially visible
+        this._scene.add(this._surfacePlaceholder);
 
-    loadModels() {
-        const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
-        const gltfLoader = new GLTFLoader();
-        modelsToLoad.forEach((modelUrl, index) => {
-            gltfLoader.load(modelUrl, (gltf) => {
-                const model = gltf.scene;
-                model.visible = false; // Initially hide the models
-
-                model.traverse((child) => {
-                    if (child.material) {
-                        child.material.envMap = this._envMap;
-                        child.material.needsUpdate = true;
-                    }
-                });
-
-                if (gltf.animations && gltf.animations.length) {
-                    const mixer = new THREE.AnimationMixer(model);
-                    gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
-                    this._animationMixers.push(mixer);
-
-                    setTimeout(() => {
-                        mixer.stopAllAction();
-                    }, 9999);
-                }
-
-                this._gltfData[index] = gltf;
-                this._models[index] = model;
-
-                // Add event listener for placeholder tap to show model
-                if (index === 0) {
-                    this._surfacePlaceholder.onClick = () => {
-                        this.placeModel(model);
-                    };
-                }
-            }, undefined, (error) => {
-                console.error("Model loading error", error);
-            });
+        // Add event listener for clicking on the placeholder
+        this._renderer.domElement.addEventListener("click", (event) => {
+            this.onCanvasClick(event);
         });
     }
 
-    placeModel(model) {
-        this._currentModel = model;
-        model.visible = true;
-        this._scene.add(model);
-        this._surfacePlaceholder.visible = false; // Hide the placeholder after tap
-        this._modelPlaced = true;
+    onCanvasClick(event) {
+        if (this._placeholderVisible) {
+            const mouse = new THREE.Vector2();
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            this._raycaster.setFromCamera(mouse, this._camera);
+            const intersects = this._raycaster.intersectObject(this._surfacePlaceholder);
+            if (intersects.length > 0) {
+                this.placeCar();
+            }
+        }
+    }
+
+    placeCar() {
+        if (!this._modelPlaced) {
+            this._modelPlaced = true;
+            this._surfacePlaceholder.visible = false; // Hide the placeholder after placing
+            this._placeholderVisible = false;
+            if (this._currentModel) {
+                this._currentModel.visible = true; // Make model visible
+            }
+            this.oxSDK.start();
+        }
     }
 
     setupRenderer(renderCanvas) {
@@ -174,6 +157,44 @@ class OxExperience {
         this._controls.enableZoom = true;
         this._controls.enableRotate = true;
         this._controls.enablePan = false;
+
+        renderCanvas.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 2) {
+                this._controls.enablePan = false;
+            }
+        });
+
+        renderCanvas.addEventListener('touchend', () => {
+            this._controls.enablePan = false;
+        });
+    }
+
+    loadModels() {
+        const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
+        const gltfLoader = new GLTFLoader();
+        modelsToLoad.forEach((modelUrl, index) => {
+            gltfLoader.load(modelUrl, (gltf) => {
+                const model = gltf.scene;
+                model.traverse((child) => {
+                    if (child.material) {
+                        child.material.envMap = this._envMap;
+                        child.material.needsUpdate = true;
+                    }
+                });
+
+                // Initially set the model to invisible
+                model.visible = false;
+
+                if (index === 0) {
+                    this._currentModel = model;
+                }
+                this._gltfData[index] = gltf;
+                this._models[index] = model;
+                this._scene.add(model);
+            }, undefined, (error) => {
+                console.error("Model loading error", error);
+            });
+        });
     }
 
     render() {
@@ -201,80 +222,287 @@ class OxExperience {
     changeModelsColor(value) {
         if (this._currentModel) {
             this._currentModel.traverse((child) => {
-                if (child.material) {
-                    child.material.color.setHex(value);
+                if (child.isMesh) {
+                    child.material.color.set(value);
                 }
             });
         }
     }
+}
 
-    switchModel(index) {
-        if (this._currentModel) {
-            this._scene.remove(this._currentModel);
-            const currentMixer = this._animationMixers[index];
-            if (currentMixer) {
-                currentMixer.stopAllAction();
+window.experience = new OxExperience();
+experience.init();
+
+
+            // switchModel(index) {
+            //     if (this._currentModel) {
+            //         this._scene.remove(this._currentModel);
+            //     }
+            //     this._currentModel = this._models[index];
+            //     if (this._currentModel) {
+            //         this._scene.add(this._currentModel);
+            //     }
+            // }
+            switchModel(index) {
+                // Stop and remove the current model from the scene
+                if (this._currentModel) {
+                    this._scene.remove(this._currentModel);
+
+                    // Stop all animations of the current model
+                    const currentMixer = this._animationMixers[index];
+                    if (currentMixer) {
+                        currentMixer.stopAllAction();
+                    }
+                }
+
+                // Set the new model as the current model
+                this._currentModel = this._models[index];
+                if (this._currentModel) {
+                    this._scene.add(this._currentModel);
+
+                    // Initialize animation if the model has animations
+                    const mixer = new THREE.AnimationMixer(this._currentModel);
+                    const gltf = this._gltfData[index]; // Assuming you store the GLTF data
+
+                    if (gltf && gltf.animations && gltf.animations.length) {
+                        gltf.animations.forEach((clip) => {
+                            mixer.clipAction(clip).play();
+                        });
+                        this._animationMixers[index] = mixer; // Store the mixer for the new model
+                        setTimeout(() => {
+                            mixer.stopAllAction();
+                        }, 9999);
+                    }
+                }
+            }
+            // playAudio(audioFile) {
+            //     const audio = new Audio(audioFile);
+            //     audio.play();
+            // }
+        }
+        let previousTouch = null;
+       function onTouchStart(event) {
+            if (event.touches.length === 1) {
+                previousTouch = { x: event.touches[0].clientX, y: event.touches[0].clientY };
             }
         }
 
-        this._currentModel = this._models[index];
-        if (this._currentModel) {
-            this._scene.add(this._currentModel);
+        function onTouchMove(event) {
+            if (event.touches.length === 1 && previousTouch) {
+                const touch = event.touches[0];
+                const deltaX = touch.clientX - previousTouch.x;
+                const deltaY = touch.clientY - previousTouch.y;
 
-            const mixer = new THREE.AnimationMixer(this._currentModel);
-            const gltf = this._gltfData[index];
+                // Update cube rotation based on touch movement
+                cube.rotation.y += deltaX * 0.01; // Adjust sensitivity as needed
+                cube.rotation.x += deltaY * 0.01;
 
-            if (gltf && gltf.animations && gltf.animations.length) {
-                gltf.animations.forEach((clip) => {
-                    mixer.clipAction(clip).play();
-                });
-                this._animationMixers[index] = mixer;
-                setTimeout(() => {
-                    mixer.stopAllAction();
-                }, 9999);
+                // Update previous touch position
+                previousTouch = { x: touch.clientX, y: touch.clientY };
             }
         }
-    }
-}
 
-class OxExperienceUI {
-    _loadingScreen = null;
-    _errorScreen = null;
-    _errorTitle = null;
-    _errorMessage = null;
+         function onTouchEnd() {
+            previousTouch = null; // Reset on touch end
+        }
+        // Event listeners
+        window.addEventListener('touchstart', onTouchStart);
+        window.addEventListener('touchmove', onTouchMove);
+        window.addEventListener('touchend', onTouchEnd);
+        class OxExperienceUI {
+            _loadingScreen = null;
+            _errorScreen = null;
+            _errorTitle = null;
+            _errorMessage = null;
 
-    init() {
-        this._loadingScreen = document.querySelector("#loading-screen");
-        this._errorScreen = document.querySelector("#error-screen");
-        this._errorTitle = document.querySelector("#error-title");
-        this._errorMessage = document.querySelector("#error-message");
-    }
+            init() {
+                try {
+                    this._loadingScreen = document.querySelector("#loading-screen");
+                    this._errorScreen = document.querySelector("#error-screen");
+                    this._errorTitle = document.querySelector("#error-title");
+                    this._errorMessage = document.querySelector("#error-message");
+                    this._ins7 = document.querySelector("#ins7");
+                    this._transformControls = document.querySelector("#transform-controls");
+                    this._colorControls = document.querySelector("#color-controls");
+                    this._errorimg = document.querySelector("#errorimg");
+                    this._modelControls = document.querySelector("#model-controls");
+                    this._backbutton = document.querySelector("#back-button");
+                    this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
+                    this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
 
-    showLoading() {
-        this._loadingScreen.style.display = "block";
-    }
+                    document.querySelector("#tap-to-place").addEventListener("click", () => {
+                         playAudio("Feture.mp3");
+                        oxExp.placeCar();
+                        this._transformControls.style.display = "none";
+                        this._colorControls.style.display = "none";
+                        this._modelControls.style.display = "flex";
+                        this._insidebuttonscontrols.style.display = "none";
+                        this._insidebuttonscontrols1.style.display = "none";
+                        this._backbutton.style.display = "none";
+                    });
 
-    hideLoading() {
-        this._loadingScreen.style.display = "none";
-    }
+                    document.querySelector("#black").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0x000000);
+                    });
+                    document.querySelector("#blue").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0x0000ff);
+                    });
+                    document.querySelector("#orange").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0xffa500);
+                    });
+                    document.querySelector("#silver").addEventListener("click", () => {
+                        oxExp.changeModelsColor(0xc0c0c0);
+                    });
 
-    showError(title, message) {
-        this._errorTitle.innerText = title;
-        this._errorMessage.innerText = message;
-        this._errorScreen.style.display = "block";
-    }
+                    document.querySelector("#model1").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        playAudio("afterf.mp3");
 
-    hideError() {
-        this._errorScreen.style.display = "none";
-    }
-}
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('model-controls').style.display = 'none';
+                        document.getElementById('errorimg').style.display = 'none';
 
-const oxExperienceUI = new OxExperienceUI();
-oxExperienceUI.init();
+                    });
+                    document.querySelector("#model2").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        playAudio("benfitf.mp3");
 
-const oxExperience = new OxExperience();
-oxExperience.init().then(() => {
-    oxExperienceUI.hideLoading();
-}).catch((err) => {
-    oxExperienceUI.showError("Error", err.message);
-});
+                        document.getElementById('insidebuttons-controls1').style.display = 'flex';
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('model-controls').style.display = 'none';
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('ins7').style.display = 'none';
+
+
+                    });
+                    document.querySelector("#back").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        // playAudio("");
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'none';
+                        document.getElementById('model-controls').style.display = 'flex';
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins1").addEventListener("click", () => {
+                        oxExp.switchModel(0);
+                        playAudio("Intro.mp3");
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+
+
+                    });
+                    document.querySelector("#ins2").addEventListener("click", () => {
+                        oxExp.switchModel(1);
+                        playAudio("parts.mp3");
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins3").addEventListener("click", () => {
+                        oxExp.switchModel(2);
+                        playAudio("Usage.mp3");
+
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('insidebuttons-controls').style.display = 'block';
+                        document.getElementById('insidebuttons-controls1').style.display = 'none';
+                        document.getElementById('back-button').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins4").addEventListener("click", () => {
+                        oxExp.switchModel(3);
+                        playAudio("wrong.mp3");
+
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('insidebuttons-controls1').style.display = 'flex';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('errorimg').style.display = 'block';
+                        document.getElementById('ins7').style.display = 'block';
+                        document.getElementById('ins4').style.display = 'none';
+
+                    });
+                     document.querySelector("#ins7").addEventListener("click", () => {
+                        oxExp.switchModel(3);
+                        playAudio("write.mp3");
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins5").addEventListener("click", () => {
+                        oxExp.switchModel(4);
+                        playAudio("USP_2.mp3");
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('insidebuttons-controls1').style.display = 'flex';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
+
+                    });
+                    document.querySelector("#ins6").addEventListener("click", () => {
+                        oxExp.switchModel(5);
+                        playAudio("USP_3.mp3");
+                        document.getElementById('errorimg').style.display = 'none';
+                        document.getElementById('insidebuttons-controls').style.display = 'none';
+                        document.getElementById('insidebuttons-controls1').style.display = 'flex';
+                        document.getElementById('back-button').style.display = 'block';
+                        document.getElementById('ins7').style.display = 'none';
+                        document.getElementById('ins4').style.display = 'block';
+
+                    });
+
+                } catch (err) {
+                    console.error("Error initializing UI", err);
+                }
+            }	
+
+            hideLoading() {
+                this._loadingScreen.style.display = "none";
+                this._transformControls.style.display = "block";
+            }
+
+            showError(title, message) {
+                this._errorTitle.textContent = title;
+                this._errorMessage.textContent = message;
+                this._errorScreen.style.display = "block";
+            }
+        }
+        var audio = document.getElementById('audioPlayer');
+
+        function playAudio(audioFile) {
+            // Stop current audio if playing
+            if (!audio.paused) {
+                audio.pause();
+                audio.currentTime = 0; // Reset time to start
+            }
+
+            // Set the new audio source and play
+            audio.src = audioFile;
+            audio.play().catch(function (error) {
+                console.log('Playback prevented:', error);
+            });
+        }
+        const oxExp = new OxExperience();
+        const oxUI = new OxExperienceUI();
+
+        oxExp
+            .init()
+            .then(() => {
+                oxUI.init();
+                oxUI.hideLoading();
+            })
+            .catch((error) => {
+                console.error("Error initializing Onirix SDK", error);
+                oxUI.showError("Initialization Error", error.message);
+            });
