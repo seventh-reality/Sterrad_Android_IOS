@@ -13,10 +13,12 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _controls = null;
             _animationMixers = [];
             _clock = null;
-            _carPlaced = false;
+            _CarPlaced = false;
             _gltfData = [];
             oxSDK;
             _scale =0.1;
+            _models =false;
+             _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
    
 
@@ -24,7 +26,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 try {
                     this._raycaster = new THREE.Raycaster();
                     this._clock = new THREE.Clock(true);
-                    this._carPlaced = false;
+                    this._CarPlaced = false;
                     const renderCanvas = await this.initSDK();
                     this.setupRenderer(renderCanvas);
                     this.setupControls(renderCanvas);
@@ -60,7 +62,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     });
 
                     this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                        if (this._modelPlaced && !this.iscarPlaced()) {
+                        if (this._modelPlaced && !this.isCarPlaced()) {
                             this._models.forEach((model) => {
                                 model.position.copy(hitResult.position);
                             });
@@ -470,7 +472,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 } catch (err) {
                     console.error("Error initializing UI", err);
                 }
-            }
+            }	
 
             hideLoading() {
                 this._loadingScreen.style.display = "none";
