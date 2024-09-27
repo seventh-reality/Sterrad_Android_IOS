@@ -16,8 +16,9 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _carPlaced = false;
             _gltfData = [];
             oxSDK;
-            _scale =0.1; 
-            _modelPlaced = false;
+            _scale =0.1;
+            _models =false;
+             _modelPlaced = false;
    
 
             async init() {
@@ -36,7 +37,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     this._envMap = textureLoader.load("envmap.jpg");
                     this._envMap.mapping = THREE.EquirectangularReflectionMapping;
                     this._envMap.encoding = THREE.sRGBEncoding;
-             
+                
     
 
                     this.oxSDK.subscribe(OnirixSDK.Events.OnFrame, () => {
@@ -60,11 +61,8 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     this.oxSDK.subscribe(OnirixSDK.Events.OnResize, () => {
                         this.onResize();
                     });
-                        
+
                     this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-            if (!this._carPlaced) {
-                
-               this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
                         if (this._modelPlaced && !this.isCarPlaced()) {
                             this._models.forEach((model) => {
                                 model.position.copy(hitResult.position);
@@ -86,7 +84,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                                     }
                                 });
                                   this._scene.scale.set(0.5, 0.5, 0.5);
-                                    
+                                  this._scene.visible = false;   
                                 if (gltf.animations && gltf.animations.length) {
                                     const mixer = new THREE.AnimationMixer(model);
                                     gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
@@ -111,7 +109,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                         });
                     });
 
-                   
+                    this.addLights();
                 } catch (err) {
                     console.error("Error initializing OxExperience", err);
                     throw err;
@@ -133,9 +131,11 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
 
             placeCar() {
                 this._carPlaced = true;
+                this._model.visible = true; // Show the model when car is placed
+                this._model.position.copy(this._surfacePlaceholder.position); // Move model to placeholder's position    
                 this.oxSDK.start();
-            }
-             
+            }    
+
             isCarPlaced() {
                 return this._carPlaced;
             }
@@ -477,7 +477,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                     console.error("Error initializing UI", err);
                 }
             }
-    
 
             hideLoading() {
                 this._loadingScreen.style.display = "none";
