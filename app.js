@@ -111,7 +111,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                         });
                     });
 
-                    this.addLights();
+                   
                 } catch (err) {
                     console.error("Error initializing OxExperience", err);
                     throw err;
