@@ -16,8 +16,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _CarPlaced = false;
             _gltfData = [];
             oxSDK;
-            _scale =0.1;
-            _models =false;
+            _scale =0.1; 
              _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
    
