@@ -17,7 +17,8 @@
             _gltfData = [];
             oxSDK;
             _scale =0.1;
-          _models=false;
+            _models =false;
+             _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
    
 
