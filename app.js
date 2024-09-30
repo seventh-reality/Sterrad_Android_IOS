@@ -1,4 +1,4 @@
-import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
+ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
         import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
         import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
         import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
@@ -17,7 +17,6 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
             _gltfData = [];
             oxSDK;
             _scale =0.1;
-             _surfacePlaceholder = null; // Surface placeholder reference
              _modelPlaced = false;
    
 
@@ -471,7 +470,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
                 } catch (err) {
                     console.error("Error initializing UI", err);
                 }
-            }	
+            }
 
             hideLoading() {
                 this._loadingScreen.style.display = "none";
