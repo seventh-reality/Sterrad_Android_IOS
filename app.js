@@ -17,6 +17,7 @@
             _gltfData = [];
             oxSDK;
             _scale =0.1;
+          _models=false;
              _modelPlaced = false;
    
 
