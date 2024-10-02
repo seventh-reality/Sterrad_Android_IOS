@@ -67,7 +67,7 @@
                         }
                     });
 
-                    const modelsToLoad = ["Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
+                    const modelsToLoad = ["Recticle.glb","Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
                     const gltfLoader = new GLTFLoader();
                     modelsToLoad.forEach((modelUrl, index) => {
                         gltfLoader.load(modelUrl, (gltf) => {
@@ -336,6 +336,7 @@
                     this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
 
                     document.querySelector("#tap-to-place").addEventListener("click", () => {
+                        oxExp.switchModel(0);
                          playAudio("Feture.mp3");
                         oxExp.placeCar();
                         this._transformControls.style.display = "none";
@@ -360,7 +361,7 @@
                     });
 
                     document.querySelector("#model1").addEventListener("click", () => {
-                        oxExp.switchModel(0);
+                        oxExp.switchModel(1);
                         playAudio("afterf.mp3");
 
                         document.getElementById('insidebuttons-controls').style.display = 'block';
@@ -371,7 +372,7 @@
 
                     });
                     document.querySelector("#model2").addEventListener("click", () => {
-                        oxExp.switchModel(0);
+                        oxExp.switchModel(2);
                         playAudio("benfitf.mp3");
 
                         document.getElementById('insidebuttons-controls1').style.display = 'flex';
@@ -384,7 +385,7 @@
 
                     });
                     document.querySelector("#back").addEventListener("click", () => {
-                        oxExp.switchModel(0);
+                        oxExp.switchModel(3);
                         // playAudio("");
                         document.getElementById('insidebuttons-controls1').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
@@ -396,7 +397,7 @@
 
                     });
                     document.querySelector("#ins1").addEventListener("click", () => {
-                        oxExp.switchModel(0);
+                        oxExp.switchModel(1);
                         playAudio("Intro.mp3");
                         document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'block';
@@ -406,7 +407,7 @@
 
                     });
                     document.querySelector("#ins2").addEventListener("click", () => {
-                        oxExp.switchModel(1);
+                        oxExp.switchModel(2);
                         playAudio("parts.mp3");
                         document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'block';
@@ -415,7 +416,7 @@
 
                     });
                     document.querySelector("#ins3").addEventListener("click", () => {
-                        oxExp.switchModel(2);
+                        oxExp.switchModel(3);
                         playAudio("Usage.mp3");
 
                         document.getElementById('errorimg').style.display = 'none';
@@ -425,7 +426,7 @@
 
                     });
                     document.querySelector("#ins4").addEventListener("click", () => {
-                        oxExp.switchModel(3);
+                        oxExp.switchModel(4);
                         playAudio("wrong.mp3");
 
                         document.getElementById('insidebuttons-controls').style.display = 'none';
@@ -437,7 +438,7 @@
 
                     });
                      document.querySelector("#ins7").addEventListener("click", () => {
-                        oxExp.switchModel(3);
+                        oxExp.switchModel(4);
                         playAudio("write.mp3");
                         document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('ins7').style.display = 'none';
@@ -445,7 +446,7 @@
 
                     });
                     document.querySelector("#ins5").addEventListener("click", () => {
-                        oxExp.switchModel(4);
+                        oxExp.switchModel(5);
                         playAudio("USP_2.mp3");
                         document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
@@ -456,7 +457,7 @@
 
                     });
                     document.querySelector("#ins6").addEventListener("click", () => {
-                        oxExp.switchModel(5);
+                        oxExp.switchModel(6);
                         playAudio("USP_3.mp3");
                         document.getElementById('errorimg').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
