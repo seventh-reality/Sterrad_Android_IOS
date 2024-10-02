@@ -137,6 +137,10 @@
             isCarPlaced() {
                 return this._carPlaced;
             }
+         onHitTest(listener) {
+        this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, listener);
+               }
+
 
             setupRenderer(renderCanvas) {
                 try {
