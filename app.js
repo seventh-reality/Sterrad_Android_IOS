@@ -336,7 +336,7 @@
                     this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
 
                     document.querySelector("#tap-to-place").addEventListener("click", () => {
-                        oxExp.switchModel(0);
+                        oxExp.switchModel(1);
                          playAudio("Feture.mp3");
                         oxExp.placeCar();
                         this._transformControls.style.display = "none";
@@ -372,7 +372,7 @@
 
                     });
                     document.querySelector("#model2").addEventListener("click", () => {
-                        oxExp.switchModel(2);
+                        oxExp.switchModel(1);
                         playAudio("benfitf.mp3");
 
                         document.getElementById('insidebuttons-controls1').style.display = 'flex';
@@ -385,7 +385,7 @@
 
                     });
                     document.querySelector("#back").addEventListener("click", () => {
-                        oxExp.switchModel(3);
+                        oxExp.switchModel(1);
                         // playAudio("");
                         document.getElementById('insidebuttons-controls1').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
