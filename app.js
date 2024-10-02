@@ -16,7 +16,7 @@
             _CarPlaced = false;
             _gltfData = [];
             oxSDK;
-            _scale =0.1;
+            
              _modelPlaced = false;
    
 
@@ -335,10 +335,10 @@
                     this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
                     this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
 
-                    document.querySelector("#tap-to-place").addEventListener("click", () => {
-                        oxExp.switchModel(1);
+                    document.querySelector("#tap-to-place").addEventListener("click", () => {       
                          playAudio("Feture.mp3");
                         oxExp.placeCar();
+                        oxExp.switchModel(1);
                         this._transformControls.style.display = "none";
                         this._colorControls.style.display = "none";
                         this._modelControls.style.display = "flex";
