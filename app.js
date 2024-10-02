@@ -336,7 +336,7 @@
                     this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
 
                     document.querySelector("#tap-to-place").addEventListener("click", () => {
-                        oxExp.switchModel(0);
+                        oxExp.switchModel(1);
                          playAudio("Feture.mp3");
                         oxExp.placeCar();
                         this._transformControls.style.display = "none";
