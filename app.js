@@ -339,7 +339,7 @@
                         document.getElementById('errorimg').style.display = 'none';
                     });
                     document.querySelector("#model2").addEventListener("click", () => {
-                        oxExp.switchModel(2);
+                        oxExp.switchModel(1);
                         playAudio("benfitf.mp3");
                         document.getElementById('insidebuttons-controls1').style.display = 'flex';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
@@ -349,7 +349,7 @@
                         document.getElementById('ins7').style.display = 'none';
                     });
                     document.querySelector("#back").addEventListener("click", () => {
-                        oxExp.switchModel(3);
+                        oxExp.switchModel(1);
                         // playAudio("");
                         document.getElementById('insidebuttons-controls1').style.display = 'none';
                         document.getElementById('insidebuttons-controls').style.display = 'none';
