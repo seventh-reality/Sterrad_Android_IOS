@@ -18,6 +18,8 @@
             oxSDK;
             _scale =0.1;
              _modelPlaced = false;
+            _lastPinchDistance = null; // To track pinch zoom
+            _lastTouchX = null; // To track single-finger rotation
    
 
             async init() {
@@ -110,6 +112,8 @@
                     console.error("Error initializing OxExperience", err);
                     throw err;
                 }
+             // Add touch event listeners for pinch zoom and rotation
+           this.addTouchListeners();
             }
 
             async initSDK() {
