@@ -246,16 +246,6 @@
                     });
                 }
             }
-
-            // switchModel(index) {
-            //     if (this._currentModel) {
-            //         this._scene.remove(this._currentModel);
-            //     }
-            //     this._currentModel = this._models[index];
-            //     if (this._currentModel) {
-            //         this._scene.add(this._currentModel);
-            //     }
-            // }
             switchModel(index) {
                 // Stop and remove the current model from the scene
                 if (this._currentModel) {
@@ -288,36 +278,49 @@
                     }
                 }
             }
-            // playAudio(audioFile) {
-            //     const audio = new Audio(audioFile);
-            //     audio.play();
-            // }
-        }
-        let previousTouch = null;
-       function onTouchStart(event) {
-            if (event.touches.length === 1) {
-                previousTouch = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+            // Add touch listeners for pinch zoom and single-finger rotation
+    addTouchListeners() {
+        const canvas = this._renderer.domElement;
+        
+        canvas.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 2) {
+                // Pinch zoom start
+                this._lastPinchDistance = this.getDistance(event.touches);
+            } else if (event.touches.length === 1) {
+                // Single finger rotation start
+                this._lastTouchX = event.touches[0].clientX;
             }
-        }
+        });
 
-        function onTouchMove(event) {
-            if (event.touches.length === 1 && previousTouch) {
-                const touch = event.touches[0];
-                const deltaX = touch.clientX - previousTouch.x;
-                const deltaY = touch.clientY - previousTouch.y;
-
-                // Update cube rotation based on touch movement
-                cube.rotation.y += deltaX * 0.01; // Adjust sensitivity as needed
-                cube.rotation.x += deltaY * 0.01;
-
-                // Update previous touch position
-                previousTouch = { x: touch.clientX, y: touch.clientY };
+        canvas.addEventListener('touchmove', (event) => {
+            if (event.touches.length === 2 && this._lastPinchDistance !== null) {
+                // Pinch zoom move
+                const newDistance = this.getDistance(event.touches);
+                const scale = newDistance / this._lastPinchDistance;
+                this._lastPinchDistance = newDistance;
+                this.scaleCar(this._model.scale.x * scale); // Adjust scale
+            } else if (event.touches.length === 1 && this._lastTouchX !== null) {
+                // Single finger rotation move
+                const deltaX = event.touches[0].clientX - this._lastTouchX;
+                this._lastTouchX = event.touches[0].clientX;
+                this.rotateCar(this._model.rotation.y + deltaX * 0.01); // Adjust rotation
             }
-        }
+        });
 
-         function onTouchEnd() {
-            previousTouch = null; // Reset on touch end
+        canvas.addEventListener('touchend', () => {
+            // Reset touch states on end
+            this._lastPinchDistance = null;
+            this._lastTouchX = null;
+        });
+    }
+
+    getDistance(touches) {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }  
         }
+        
         // Event listeners
         window.addEventListener('touchstart', onTouchStart);
         window.addEventListener('touchmove', onTouchMove);
