@@ -1,7 +1,6 @@
  import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
         import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
         import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
-        import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
         class OxExperience {
             _renderer = null;
             _scene = null;
@@ -308,7 +307,7 @@
                     this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
                     this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
                     document.querySelector("#tap-to-place").addEventListener("click", () => {
-                        oxExp.switchModel(0);
+                        oxExp.switchModel(1);
                          playAudio("Feture.mp3");
                         oxExp.placeCar();
                         this._transformControls.style.display = "none";
