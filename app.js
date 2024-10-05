@@ -230,10 +230,9 @@ class OxExperience {
             console.error("Error handling resize", err);
         }
     }
-    scaleCar(value) {
+    scaleScene(value) {
         this._scene.scale.set(value, value, value);
     }
-
 
     changeModelsColor(value) {
         if (this._currentModel) {
@@ -310,7 +309,7 @@ class OxExperience {
                 const newDistance = this.getDistance(event.touches);
                 const scale = newDistance / this._lastPinchDistance;
                 this._lastPinchDistance = newDistance;
-                this.scaleCar(this. _scene.scale.x * scale); // Adjust scale
+                 this.scaleScene(this._scene.scale.x * scale); // Adjust scene scale
             } else if (event.touches.length === 1 && this._lastTouchX !== null) {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
