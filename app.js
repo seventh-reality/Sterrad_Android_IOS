@@ -546,7 +546,6 @@ function playAudio(audioFile) {
         console.log('Playback prevented:', error);
     });
 }
-oxUI.onScaleChange((value) => { oxExp.scaleCar(value) });
 const oxExp = new OxExperience();
 const oxUI = new OxExperienceUI();
 
