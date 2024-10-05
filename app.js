@@ -105,10 +105,9 @@
                             console.error("Model loading error", error);
                         });
                     });
-                 // Add touch event listeners for pinch zoom and rotation
-                    this.addTouchListeners(); 
-              }  
-                    this.addLights();
+              }    
+             this.addTouchListeners(); 
+             this.addLights();
                 } catch (err) {
                     console.error("Error initializing OxExperience", err);
                     throw err;
@@ -325,7 +324,7 @@
                 const newDistance = this.getDistance(event.touches);
                 const scale = newDistance / this._lastPinchDistance;
                 this._lastPinchDistance = newDistance;
-                this.scaleCar(this._model.scale.x * scale); // Adjust scale
+                this.scaleCar(this._scene.scale.x * scale); // Adjust scale
             } else if (event.touches.length === 1 && this._lastTouchX !== null) {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
