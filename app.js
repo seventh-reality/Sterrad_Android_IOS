@@ -233,6 +233,9 @@ class OxExperience {
     scaleScene(value) {
         this._scene.scale.set(value, value, value);
     }
+     rotateCar(value) {
+        this._model.rotation.y = value;
+    }
 
     changeModelsColor(value) {
         if (this._currentModel) {
