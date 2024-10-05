@@ -230,6 +230,10 @@ class OxExperience {
             console.error("Error handling resize", err);
         }
     }
+    scaleCar(value) {
+        this._model.scale.set(value, value, value);
+    }
+
 
     changeModelsColor(value) {
         if (this._currentModel) {
@@ -542,6 +546,7 @@ function playAudio(audioFile) {
         console.log('Playback prevented:', error);
     });
 }
+oxUI.onScaleChange((value) => { oxExp.scaleCar(value) });
 const oxExp = new OxExperience();
 const oxUI = new OxExperienceUI();
 
