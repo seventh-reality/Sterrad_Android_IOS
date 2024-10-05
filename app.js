@@ -231,7 +231,7 @@ class OxExperience {
         }
     }
     scaleCar(value) {
-        this._model.scale.set(value, value, value);
+        this._scene.scale.set(value, value, value);
     }
 
 
