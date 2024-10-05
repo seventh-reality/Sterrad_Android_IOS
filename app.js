@@ -105,10 +105,9 @@
                             console.error("Model loading error", error);
                         });
                     });
-                 
-              };
-                   // Add touch event listeners for pinch zoom and rotation
-                    this.addTouchListeners();
+                 // Add touch event listeners for pinch zoom and rotation
+                    this.addTouchListeners(); 
+              }  
                     this.addLights();
                 } catch (err) {
                     console.error("Error initializing OxExperience", err);
