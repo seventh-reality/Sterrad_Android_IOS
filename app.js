@@ -234,7 +234,7 @@ class OxExperience {
         this._scene.scale.set(value, value, value);
     }
      rotateCar(value) {
-        this._scene.rotation.y = value;
+        this._models.rotation.y = value;
     }
 
     changeModelsColor(value) {
@@ -317,7 +317,7 @@ class OxExperience {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
                 this._lastTouchX = event.touches[0].clientX;
-                this.rotateCar(this. _scene.rotation.y + deltaX * 0.01); // Adjust rotation
+                this.rotateCar(this._models.rotation.y + deltaX * 0.01); // Adjust rotation
             }
         });
 
