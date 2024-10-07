@@ -99,7 +99,7 @@ class OxExperience {
                             this._modelPlaced = true;
                             this._scene.add(model);
                             this._pivot = new THREE.Object3D();
-                            this._pivot.add(this._model); // Add the model to the pivot
+                            this._pivot.add(this._models); // Add the model to the pivot
                             this._scene.add(this._pivot); // Add pivot to the scene
                         }
                     } catch (err) {
@@ -235,7 +235,7 @@ class OxExperience {
             console.error("Error handling resize", err);
         }
     }
-    sscaleScene(value) {
+    scaleScene(value) {
         this._pivot.scale.set(value, value, value); // Scale the pivot (and thus the model)
     }
 
