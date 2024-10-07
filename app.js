@@ -8,7 +8,6 @@ class OxExperience {
     _scene = null;
     _camera = null;
     _models = [];
-    _pivot = null; 
     _modelIndex = 0;
     _currentModel = null;
     _controls = null;
@@ -98,9 +97,6 @@ class OxExperience {
                             this._currentModel = model;
                             this._modelPlaced = true;
                             this._scene.add(model);
-                            this._pivot = new THREE.Object3D();
-                            this._pivot.add(this._models); // Add the model to the pivot
-                            this._scene.add(this._pivot); // Add pivot to the scene
                         }
                     } catch (err) {
                         console.error("Error loading model", err);
@@ -134,7 +130,6 @@ class OxExperience {
     placeCar() {
         this._carPlaced = true;
         this.oxSDK.start();
-        this._pivot.position.copy(this._surfacePlaceholder.position); // Move pivot (and thus the model) to placeholder's position
     }
 
     isCarPlaced() {
@@ -236,12 +231,12 @@ class OxExperience {
         }
     }
     scaleScene(value) {
-        this._pivot.scale.set(value, value, value); // Scale the pivot (and thus the model)
+        this._scene.scale.set(value, value, value);
+    }
+     rotateCar(value) {
+        this._models.rotation.y = value;
     }
 
-    rotateScene(value) {
-        this._pivot.rotation.y = value; // Rotate the pivot (and thus the model) around Y-axis
-    }
     changeModelsColor(value) {
         if (this._currentModel) {
             this._currentModel.traverse((child) => {
@@ -311,20 +306,21 @@ class OxExperience {
             }
         });
 
-       canvas.addEventListener('touchmove', (event) => {
+        canvas.addEventListener('touchmove', (event) => {
             if (event.touches.length === 2 && this._lastPinchDistance !== null) {
                 // Pinch zoom move
                 const newDistance = this.getDistance(event.touches);
                 const scale = newDistance / this._lastPinchDistance;
                 this._lastPinchDistance = newDistance;
-                this.scaleScene(this._pivot.scale.x * scale); // Adjust pivot (and thus model) scale
+                 this.scaleScene(this._scene.scale.x * scale); // Adjust scene scale
             } else if (event.touches.length === 1 && this._lastTouchX !== null) {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
                 this._lastTouchX = event.touches[0].clientX;
-                this.rotateScene(this._pivot.rotation.y + deltaX * 0.01); // Rotate the pivot (and thus the model)
+                this.rotateCar(this._models.rotation.y + deltaX * 0.01); // Adjust rotation
             }
         });
+
         canvas.addEventListener('touchend', () => {
             // Reset touch states on end
             this._lastPinchDistance = null;
