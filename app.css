@@ -195,9 +195,8 @@
         }
 
         #transform-controls,
-        #color-controls {
-            display: none;
-            position: static;
+        #color-controls {   
+            position: fixed;
             top: 20px;
             left: 20px;
             margin-left: auto;
