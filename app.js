@@ -521,6 +521,42 @@ class OxExperienceUI {
             console.error("Error initializing UI", err);
         }
     }
+       showControls() {
+        this._transformControls.style.display = "block";
+    }
+
+    showColors() {
+        this._transformControls.style.display = "none";
+        this._colorControls.style.display = "block";
+    }
+
+    onPlace(listener) {
+        this._placeButton.addEventListener('click', listener);
+    }
+
+    onScaleChange(listener) {
+        this._scaleSlider.addEventListener('input', () => { listener(this._scaleSlider.value / 100) });
+    }
+
+    onRotationChange(listener) {
+        this._rotationSlider.addEventListener('input', () => { listener(this._rotationSlider.value * Math.PI / 180) });
+    }
+
+    onBlack(listener) {
+        this._black.addEventListener('click', listener);
+    }
+
+    onOrange(listener) {
+        this._orange.addEventListener('click', listener);
+    }
+
+    onBlue(listener) {
+        this._blue.addEventListener('click', listener);
+    }
+
+    onSilver(listener) {
+        this._silver.addEventListener('click', listener);
+    }
 
     hideLoading() {
         this._loadingScreen.style.display = "none";
