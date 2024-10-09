@@ -1,3 +1,10 @@
+/* Fonts */
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap');
+
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+}
 #logoo {
             scale: .6;
         }
@@ -194,15 +201,24 @@
             margin-right: 10px;
         }
 
-        #transform-controls,
-        #color-controls {
-            display: none;
-            position: static;
-            top: 20px;
-            left: 20px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+       #transform-controls {
+    position: fixed;
+    bottom: 25px;
+    left: 0;
+    width: 100%;
+    display: none;
+    z-index: 2;
+}
+
+ #color-controls {
+    position: none;
+    bottom: 25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    display: none;
+    z-index: 2;
+}
 
         #loading-screen {
             position: absolute;
