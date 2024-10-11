@@ -108,8 +108,7 @@ canvas {
   display: flex;
   align-items: flex-end;
   position: absolute;
-  z-index: 12;
-  bottom: 90px;
+  bottom: 50%;
 }
 
 #insidebuttons-controls1 {
