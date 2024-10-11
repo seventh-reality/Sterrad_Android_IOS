@@ -118,12 +118,10 @@ class OxExperience {
     async initSDK() {
         try {
             this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
-	   
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
-                oxSDK.setIosVisualizationMode(true);		    
             };
-	   
+            this.oxSDK.setIosVisualizationMode(true);
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
@@ -146,8 +144,8 @@ class OxExperience {
             const height = renderCanvas.height;
 
             this._renderer = new THREE.WebGLRenderer({ antialias: true, canvas: renderCanvas, alpha: true });
-            this._renderer.setPixelRatio( window.devicePixelRatio );
-			this._renderer.setSize( window.innerWidth, window.innerHeight );
+            this._renderer.setPixelRatio(window.devicePixelRatio);
+            this._renderer.setSize(window.innerWidth, window.innerHeight);
             this._renderer.setClearColor(0x000000, 0);
             // this._renderer.setSize(width, height);
             this._renderer.outputEncoding = THREE.sRGBEncoding;
@@ -225,8 +223,8 @@ class OxExperience {
 
     onResize() {
         try {
-            const width = this._renderer.domElement.width;
-            const height = this._renderer.domElement.height;
+            const width = window.innerWidth; // this._renderer.domElement.width;
+            const height = window.innerHeight; // this._renderer.domElement.height;
             const cameraParams = this.oxSDK.getCameraParameters();
             this._camera.fov = cameraParams.fov;
             this._camera.aspect = cameraParams.aspect;
