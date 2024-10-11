@@ -1,429 +1,411 @@
 #logoo {
-            scale: .6;
-        }
+  scale: 0.6;
+}
 
-        #logooo {
-            scale: .6;
-            transform: translate(0%, 0%);
-        }
-         #ins7 {   
-            display: none;
-            transform: translate(0%, 0%);
-        }
+#logooo {
+  scale: 0.6;
+  transform: translate(0%, 0%);
+}
+#ins7 {
+  display: none;
+  transform: translate(0%, 0%);
+}
 
-        #ins1:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#ins1:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #ins2:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#ins2:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #ins3:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#ins3:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #ins4:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
-        #ins7:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#ins4:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
+#ins7:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #ins5:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#ins5:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #ins6:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#ins6:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #back:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#back:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #model1:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#model1:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        #model2:hover {
-            background-color: #92cfc2;
-            border-radius: 5px;
-        }
+#model2:hover {
+  background-color: #92cfc2;
+  border-radius: 5px;
+}
 
-        button3.disabled {
-            background-color: #92cfc2;
-        }
+button3.disabled {
+  background-color: #92cfc2;
+}
 
-        button1.disabled {
-            background-color: #92cfc2;
-        }
+button1.disabled {
+  background-color: #92cfc2;
+}
 
-        button2.disabled {
-            background-color: #92cfc2;
-        }
+button2.disabled {
+  background-color: #92cfc2;
+}
 
-        .container {
-            display: flex;
-            justify-content: space-between;
-            /* Distributes space between items */
-            align-items: center;
-            /* Centers items vertically if they have different heights */
-            padding: 10px;
-            /* Optional: adds padding around the container */
-        }
+.container {
+  display: flex;
+  justify-content: space-between;
+  /* Distributes space between items */
+  align-items: center;
+  /* Centers items vertically if they have different heights */
+  padding: 10px;
+  /* Optional: adds padding around the container */
+}
 
-        .container1 {
-            
-            height: 140px;
-        }
+.container1 {
+  height: 140px;
+}
 
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: #000;
-        }
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
 
-        canvas {
-            display: block;
-        }
+canvas {
+  display: block;
+}
 
-        #insidebuttons-controls {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-52%, 300%);
-            padding: 20px;
-            margin: auto;
-            padding: 25px;
-        }
+#insidebuttons-controls {
+  display: none;
+  padding: 8px;
+}
+.app-controls {
+  justify-content: center;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  position: absolute;
+  z-index: 12;
+  bottom: 90px;
+}
 
-        #insidebuttons-controls1 {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-52%, 300%);
-            padding: 20px;
-            margin: auto;
-            padding: 25px;
-        }
+#insidebuttons-controls1 {
+  display: none;
+  padding: 8px;
+}
 
-        #back {
+#back {
+  background-color: unset;
+  border: 0;
+  scale: 0.9;
+}
 
-            background-color: unset;
-            border: 0;
-            scale: .9;
-        }
+#back-button {
+  display: none;
+  padding: 8px;
+  position: absolute;
+  margin-bottom: 60px;
+  margin-left: -220px;
+}
+#errorimg {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  margin: auto;
+  padding: 25px;
+}
 
-        #back-button {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-165%, 250%);
-            padding: 20px;
-            margin: auto;
-            padding: 25px;
-        }
-        #errorimg {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            margin: auto;
-            padding: 25px;
-        }
+#model-controls {
+  display: none;
+  padding: 8px;
+}
 
-        #model-controls {
-            display: none;
-            position: absolute;
-            left: 50%;
-            transform: translate(-50%, 860%);
-            padding: 20px;
-            margin: auto;
-            margin-left: auto;
-            margin-right: auto;
-        }
+#model1 {
+  background-color: #ffffff00;
+  border: 0;
+}
 
-        #model1 {
-            background-color: #FFFFFF00;
-            border: 0;
-        }
+#model2 {
+  background-color: #ffffff00;
+  border: 0;
+}
 
-        #model2 {
-            background-color: #FFFFFF00;
-            border: 0;
-        }
+#model3 {
+  background-color: #ffffff00;
+  border: 0;
+}
 
-        #model3 {
-            background-color: #FFFFFF00;
-            border: 0;
-        }
+#tap-to-place {
+  display: block;
+  margin: auto;
+  width: 200px;
+  padding: 21px;
+  background-color: #231532;
+  color: #ffffff;
+  border: 0;
+  border-radius: 20px;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+}
 
-        #tap-to-place {
-            display: block;
-            margin: auto;
-            width: 200px;
-            padding: 21px;
-            background-color: #231532;
-            color: #FFFFFF;
-            border: 0;
-            border-radius: 20px;
-            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.2);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-        }
+button {
+  margin-right: 10px;
+}
 
-        button {
-            margin-right: 10px;
-        }
+#transform-controls,
+#color-controls {
+  display: none;
+  position: static;
+  top: 20px;
+  left: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-        #transform-controls,
-        #color-controls {
-            display: none;
-            position: static;
-            top: 20px;
-            left: 20px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+#loading-screen {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
 
-        #loading-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
+#error-screen {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 0, 0, 0.7);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
 
-        #error-screen {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 0, 0, 0.7);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
+#ins1 {
+  background-color: #ffffff00;
+  border: 0;
+  scale: 0.9;
+}
 
-        #ins1 {
-            background-color: #FFFFFF00;
-            border: 0;
-            scale: .9;
-        }
+#ins2 {
+  background-color: #ffffff00;
+  border: 0;
+  scale: 0.9;
+}
 
-        #ins2 {
-            background-color: #FFFFFF00;
-            border: 0;
-            scale: .9;
-        }
+#ins3 {
+  background-color: #ffffff00;
+  border: 0;
+  scale: 0.9;
+}
 
-        #ins3 {
-            background-color: #FFFFFF00;
-            border: 0;
-            scale: .9;
-        }
+#ins4 {
+  background-color: #ffffff00;
+  border: 0;
+  scale: 0.9;
+}
+#ins7 {
+  background-color: #ffffff00;
+  border: 0;
+  scale: 0.9;
+}
 
-        #ins4 {
-            background-color: #FFFFFF00;
-            border: 0;
-            scale: .9;
-        }
-        #ins7 {
-            background-color: #FFFFFF00;
-            border: 0;
-            scale: .9;
-        }
+#ins5 {
+  background-color: #ffffff00;
+  border: 0;
+  scale: 0.9;
+}
 
-        #ins5 {
-            background-color: #FFFFFF00;
-            border: 0;
-            scale: .9;
-        }
+#ins6 {
+  background-color: #ffffff00;
+  border: 0;
+  scale: 0.9;
+}
 
-        #ins6 {
-            background-color: #FFFFFF00;
-            border: 0;
-            scale: .9;
-        }
+#one {
+  display: none;
+  scale: 0.7;
+}
 
-        #one {
-            display: none;
-            scale: .7;
-        }
+#two {
+  display: none;
+  scale: 0.7;
+}
 
-        #two {
-            display: none;
-            scale: .7;
-        }
+#three {
+  display: none;
+  scale: 0.7;
+}
 
-        #three {
-            display: none;
-            scale: .7;
-        }
+@media only screen and (max-width: 600px) {
+  #errorimg {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -80%);
+    padding: 20px;
+    margin: auto;
+    padding: 25px;
+  }
+  #model-controls {
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translate(-48%, 750%);
+    padding: 20px;
+    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-        @media only screen and (max-width: 600px) {
-            #errorimg {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -80%);
-            padding: 20px;
-            margin: auto;
-            padding: 25px;
-        }
-            #model-controls {
-                display: none;
-                position: absolute;
-                left: 50%;
-                transform: translate(-48%, 750%);
-                padding: 20px;
-                margin: auto;
-                margin-left: auto;
-                margin-right: auto;
-            }
+  #insidebuttons-controls {
+    display: none;
+    position: static;
+    top: 50%;
+    left: 50%;
+    transform: translate(5%, 575%);
+    padding: 20px;
+    margin: auto;
+    padding: 25px;
+  }
 
-            #insidebuttons-controls {
-                display: none;
-                position: static;
-                top: 50%;
-                left: 50%;
-                transform: translate(5%, 575%);
-                padding: 20px;
-                margin: auto;
-                padding: 25px;
+  #insidebuttons-controls1 {
+    display: none;
+    position: static;
+    top: 50%;
+    left: 50%;
+    transform: translate(5%, 575%);
+    padding: 20px;
+    margin: auto;
+    padding: 25px;
+  }
 
-            }
+  #logooo {
+    scale: 0.6;
+    transform: translate(20%, -20%);
+  }
 
-            #insidebuttons-controls1 {
-                display: none;
-                position: static;
-                top: 50%;
-                left: 50%;
-                transform: translate(5%, 575%);
-                padding: 20px;
-                margin: auto;
-                padding: 25px;
+  #logoo {
+    scale: 0.6;
+    transform: translate(-20%, -20%);
+  }
 
-            }
+  #back-button {
+    display: none;
+    position: static;
+    top: 50%;
+    left: 50%;
+    transform: translate(5%, 625%);
+    padding: 20px;
+    margin: auto;
+    padding: 25px;
+  }
 
-            #logooo {
-                scale: .6;
-                transform: translate(20%, -20%);
-            }
+  #model1 {
+    background-color: #ffffff00;
+    border: 0;
+  }
 
-            #logoo {
-                scale: .6;
-                transform: translate(-20%, -20%);
-            }
+  #model2 {
+    background-color: #ffffff00;
+    border: 0;
+  }
 
-            #back-button {
-                display: none;
-                position: static;
-                top: 50%;
-                left: 50%;
-                transform: translate(5%, 625%);
-                padding: 20px;
-                margin: auto;
-                padding: 25px;
-            }
+  .container {
+    display: flex;
+    justify-content: space-between;
+    /* Distributes space between items */
+    align-items: center;
+    /* Centers items vertically if they have different heights */
+    padding: 10px;
+    /* Optional: adds padding around the container */
+  }
 
-            #model1 {
-                background-color: #FFFFFF00;
-                border: 0;
+  .container1 {
+    height: 81px;
+  }
+}
 
-            }
+/* For tablets (iPad and similar) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  #model-controls {
+    display: none;
+    position: absolute;
+    left: 50%;
+    transform: translate(-45%, 450%);
+    padding: 20px;
+    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+  }
 
-            #model2 {
-                background-color: #FFFFFF00;
-                border: 0;
+  #insidebuttons-controls {
+    display: none;
+    position: static;
+    top: 50%;
+    left: 50%;
+    transform: translate(15%, 370%);
+    padding: 20px;
+    margin: auto;
+    padding: 25px;
+  }
 
-            }
+  #model1 {
+    background-color: #ffffff00;
+    border: 0;
+    scale: 0.7;
+  }
 
-            .container {
-                display: flex;
-                justify-content: space-between;
-                /* Distributes space between items */
-                align-items: center;
-                /* Centers items vertically if they have different heights */
-                padding: 10px;
-                /* Optional: adds padding around the container */
-            }
+  #model2 {
+    background-color: #ffffff00;
+    border: 0;
+    scale: 0.7;
+  }
 
-            .container1 {
-                
-                height: 81px;
-            }
-        }
-
-        /* For tablets (iPad and similar) */
-        @media (min-width: 601px) and (max-width: 1024px) {
-            #model-controls {
-                display: none;
-                position: absolute;
-                left: 50%;
-                transform: translate(-45%, 450%);
-                padding: 20px;
-                margin: auto;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            #insidebuttons-controls {
-                display: none;
-                position: static;
-                top: 50%;
-                left: 50%;
-                transform: translate(15%, 370%);
-                padding: 20px;
-                margin: auto;
-                padding: 25px;
-
-            }
-
-            #model1 {
-                background-color: #FFFFFF00;
-                border: 0;
-                scale: .7;
-            }
-
-            #model2 {
-                background-color: #FFFFFF00;
-                border: 0;
-                scale: .7;
-            }
-
-            #back-button {
-                display: none;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-170%, 60%);
-                padding: 20px;
-                margin: auto;
-                padding: 25px;
-            }
-        }
+  #back-button {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-170%, 60%);
+    padding: 20px;
+    margin: auto;
+    padding: 25px;
+  }
+}
