@@ -117,7 +117,7 @@ class OxExperience {
 
     async initSDK() {
         try {
-            this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
+            this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQ0NTk1LCJyb2xlIjoxLCJpYXQiOjE3MjgzNzQ3MjF9.guFa6KRD2yKrT3VWEk1jLJe6saRsf1Kop5HR1cZxqhw");
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
             };
