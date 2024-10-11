@@ -233,7 +233,7 @@ class OxExperience {
     scaleScene(value) {
         this._currentModel.scale.set(value, value, value);
     }
-     rotateCar(value) {
+    rotateCar(value) {
         this._currentModel.rotation.y = value;
     }
 
@@ -257,9 +257,12 @@ class OxExperience {
     //     }
     // }
     switchModel(index) {
+        let curScale = 1;
         // Stop and remove the current model from the scene
         if (this._currentModel) {
             this._scene.remove(this._currentModel);
+            
+            curScale = this._currentModel.scale.x;
 
             // Stop all animations of the current model
             const currentMixer = this._animationMixers[index];
@@ -271,6 +274,7 @@ class OxExperience {
         // Set the new model as the current model
         this._currentModel = this._models[index];
         if (this._currentModel) {
+            this.scaleScene(curScale);
             this._scene.add(this._currentModel);
 
             // Initialize animation if the model has animations
@@ -312,7 +316,7 @@ class OxExperience {
                 const newDistance = this.getDistance(event.touches);
                 const scale = newDistance / this._lastPinchDistance;
                 this._lastPinchDistance = newDistance;
-                 this.scaleScene(this._currentModel.scale.x * scale); // Adjust scene scale
+                this.scaleScene(this._currentModel.scale.x * scale); // Adjust scene scale
             } else if (event.touches.length === 1 && this._lastTouchX !== null) {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
