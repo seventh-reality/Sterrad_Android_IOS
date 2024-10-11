@@ -13,40 +13,48 @@
         <source src="Background_Music.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
+    
     <audio id="audioPlayer" preload="auto"></audio>
 
     <div id="transform-controls">
         <button id="tap-to-place">Place Model</button>
     </div>
-     <div id="color-controls">
+
+    <div id="color-controls">
         <button id="black">Black</button>
         <button id="blue">Blue</button>
         <button id="orange">Orange</button>
         <button id="silver">Silver</button>
     </div>
-    <div id="back-button">
-        <button id="back"><img src="Back.png" style="width:32.6px;height:37.8px;"></button>
+
+    <div class="app-controls">
+        <div id="back-button">
+            <button id="back"><img src="Back.png" style="width:32.6px;height:37.8px;"></button>
+        </div>
+
+        <div id="model-controls">
+            <button id="model1"><img src="what.png" style="width:130px;height:40px; "></button>
+            <button id="model2"><img src="why.png" style="width:130px;height:40px;"></button>
+        </div>
+        <div id="insidebuttons-controls">
+            <button id="ins1"><img src="intro.png" style="width:72px;height:40px;"></button>
+            <button id="ins2"><img src="parts.png" style="width:72px;height:40px;"></button>
+            <button id="ins3"><img src="usage.png" style="width:72px;height:40px;"></button>
+        </div>
+
+        <div id="insidebuttons-controls1">
+            <button id="ins5"><img src="usp2.png" style="width:72px;height:40px;"></button>
+            <button id="ins7"><img src="usp1.png" style="width:72px;height:40px;"></button>
+            <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button>
+            <button id="ins6"><img src="usp3.png" style="width:72px;height:40px;"></button>
+
+        </div>
     </div>
+
     <div id="errorimg">
         <img id="back"><img src="Game_over_close_button.png" style="width:225px;height:214px;"></img>
     </div>
-    <div id="model-controls">
-        <button id="model1"><img src="what.png" style="width:130px;height:40px; "></button>
-        <button id="model2"><img src="why.png" style="width:130px;height:40px;"></button>
-    </div>
-    <div id="insidebuttons-controls">
-        <button id="ins1"><img src="intro.png" style="width:72px;height:40px;"></button>
-        <button id="ins2"><img src="parts.png" style="width:72px;height:40px;"></button>
-        <button id="ins3"><img src="usage.png" style="width:72px;height:40px;"></button>
-    </div>
-     
-    <div id="insidebuttons-controls1">
-        <button id="ins5"><img src="usp2.png" style="width:72px;height:40px;"></button>
-        <button id="ins7"><img src="usp1.png" style="width:72px;height:40px;"></button>
-        <button id="ins4"><img src="usp1.png" style="width:72px;height:40px;"></button>
-        <button id="ins6"><img src="usp3.png" style="width:72px;height:40px;"></button>
-        
-    </div>
+
     <div id="loading-screen">Loading...</div>
     <div id="error-screen">
         <div id="error-title"></div>
@@ -54,7 +62,7 @@
     </div>
 
     <script type="module" src="app.js"></script>
-     <script type="module" src="a24f0336-9279-4282-90fb-00d86311a827.js"></script>
+    <script type="module" src="a24f0336-9279-4282-90fb-00d86311a827.js"></script>
 </body>
 
 </html>
