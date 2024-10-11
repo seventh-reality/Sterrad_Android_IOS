@@ -106,7 +106,10 @@ canvas {
   justify-content: center;
   width: 100%;
   display: flex;
+  align-items: flex-end;
   position: absolute;
+  z-index: 12;
+  bottom: 20%;
 }
 
 #insidebuttons-controls1 {
@@ -280,7 +283,7 @@ button {
     margin: auto;
     padding: 25px;
   }
-  #model-controls {
+  /* #model-controls {
     display: none;
     position: absolute;
     left: 50%;
@@ -311,7 +314,7 @@ button {
     padding: 20px;
     margin: auto;
     padding: 25px;
-  }
+  } */
 
   #logooo {
     scale: 0.6;
@@ -323,7 +326,7 @@ button {
     transform: translate(-20%, -20%);
   }
 
-  #back-button {
+  /* #back-button {
     display: none;
     position: static;
     top: 50%;
@@ -332,7 +335,7 @@ button {
     padding: 20px;
     margin: auto;
     padding: 25px;
-  }
+  } */
 
   #model1 {
     background-color: #ffffff00;
@@ -361,7 +364,7 @@ button {
 
 /* For tablets (iPad and similar) */
 @media (min-width: 601px) and (max-width: 1024px) {
-  #model-controls {
+  /* #model-controls {
     display: none;
     position: absolute;
     left: 50%;
@@ -370,9 +373,9 @@ button {
     margin: auto;
     margin-left: auto;
     margin-right: auto;
-  }
+  } */
 
-  #insidebuttons-controls {
+  /* #insidebuttons-controls {
     display: none;
     position: static;
     top: 50%;
@@ -381,7 +384,7 @@ button {
     padding: 20px;
     margin: auto;
     padding: 25px;
-  }
+  } */
 
   #model1 {
     background-color: #ffffff00;
@@ -395,7 +398,7 @@ button {
     scale: 0.7;
   }
 
-  #back-button {
+  /* #back-button {
     display: none;
     position: absolute;
     top: 50%;
@@ -404,5 +407,5 @@ button {
     padding: 20px;
     margin: auto;
     padding: 25px;
-  }
+  } */
 }
