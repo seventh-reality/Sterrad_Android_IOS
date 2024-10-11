@@ -121,7 +121,7 @@ class OxExperience {
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
             };
-            this.oxSDK.setIosVisualizationMode(true);
+            // this.oxSDK.setIosVisualizationMode(true);
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
