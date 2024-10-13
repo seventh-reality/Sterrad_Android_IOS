@@ -249,6 +249,9 @@ class OxExperience {
         const canvas = this._renderer.domElement;
         canvas.style.setProperty("left", `0px`, "important");
         canvas.style.setProperty("top", `0px`, "important");
+        const vid = document.getElementsByTagName("video")[0];
+        vid.style.setProperty("left", `0px`, "important");
+        vid.style.setProperty("top", `0px`, "important");
     }
 
     changeModelsColor(value) {
