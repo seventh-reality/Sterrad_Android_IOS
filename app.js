@@ -1,13 +1,7 @@
 import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.5/dist/ox-sdk.esm.js";
-// import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
-// import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
-// import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
-
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-
+import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
+import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
+import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
 
 class OxExperience {
     _renderer = null;
@@ -23,6 +17,7 @@ class OxExperience {
     _gltfData = [];
     oxSDK;
     _scale = 0.3;
+    _rotation = 0;
     _modelPlaced = false;
     _lastPinchDistance = null; // To track pinch zoom
     _lastTouchX = null; // To track single-finger rotation
@@ -103,6 +98,7 @@ class OxExperience {
                             this._currentModel = model;
                             this._modelPlaced = true;
                             this.scaleScene(this._scale);
+                            this.rotateCar(this._rotation);
                             this._scene.add(model);
                         }
                     } catch (err) {
@@ -154,11 +150,8 @@ class OxExperience {
             this._renderer.setSize(window.innerWidth, window.innerHeight);
             this._renderer.setClearColor(0x000000, 0);
             this.positionCanvas();
-
             // this._renderer.setSize(width, height);
-            // this._renderer.style.left = "15px";
-            // this._renderer.style.top = "15px";
-            // this._renderer.outputEncoding = THREE.sRGBEncoding;
+            this._renderer.outputEncoding = THREE.sRGBEncoding;
 
             const cameraParams = this.oxSDK.getCameraParameters();
             this._camera = new THREE.PerspectiveCamera(cameraParams.fov, cameraParams.aspect, 0.1, 1000);
@@ -241,7 +234,6 @@ class OxExperience {
             this._camera.updateProjectionMatrix();
             this._renderer.setSize(width, height);
             this.positionCanvas();
-
         } catch (err) {
             console.error("Error handling resize", err);
         }
@@ -294,6 +286,7 @@ class OxExperience {
         this._currentModel = this._models[index];
         if (this._currentModel) {
             this.scaleScene(this._scale);
+            this.rotateCar(this._rotation);
             this._scene.add(this._currentModel);
 
             // Initialize animation if the model has animations
@@ -341,7 +334,8 @@ class OxExperience {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
                 this._lastTouchX = event.touches[0].clientX;
-                this.rotateCar(this._currentModel.rotation.y + deltaX * 0.01); // Adjust rotation
+                this._rotation = this._currentModel.rotation.y + deltaX * 0.01;
+                this.rotateCar(this._rotation); // Adjust rotation
             }
         });
 
