@@ -16,7 +16,7 @@ class OxExperience {
     _CarPlaced = false;
     _gltfData = [];
     oxSDK;
-    _scale = 0.3;
+    _scale = 0.5;
     _rotation = 0;
     _modelPlaced = false;
     _lastPinchDistance = null; // To track pinch zoom
@@ -147,9 +147,9 @@ class OxExperience {
 
             this._renderer = new THREE.WebGLRenderer({ antialias: true, canvas: renderCanvas, alpha: true });
             this._renderer.setPixelRatio(window.devicePixelRatio);
-            this._renderer.setSize(window.innerWidth, window.innerHeight);
+            this._renderer.setSize(width, height);
             this._renderer.setClearColor(0x000000, 0);
-            this.positionCanvas();
+            // this.positionCanvas();
             // this._renderer.setSize(width, height);
             this._renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -226,8 +226,8 @@ class OxExperience {
 
     onResize() {
         try {
-            const width = window.innerWidth; // this._renderer.domElement.width;
-            const height = window.innerHeight; // this._renderer.domElement.height;
+            const width = this._renderer.domElement.width;
+            const height = this._renderer.domElement.height;
             const cameraParams = this.oxSDK.getCameraParameters();
             this._camera.fov = cameraParams.fov;
             this._camera.aspect = cameraParams.aspect;
