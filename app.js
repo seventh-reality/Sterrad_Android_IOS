@@ -17,6 +17,7 @@ class OxExperience {
     _gltfData = [];
     oxSDK;
     _scale = 0.3;
+    _rotation = 0;
     _modelPlaced = false;
     _lastPinchDistance = null; // To track pinch zoom
     _lastTouchX = null; // To track single-finger rotation
@@ -97,6 +98,7 @@ class OxExperience {
                             this._currentModel = model;
                             this._modelPlaced = true;
                             this.scaleScene(this._scale);
+                            this.rotateCar(this._rotation);
                             this._scene.add(model);
                         }
                     } catch (err) {
@@ -276,6 +278,7 @@ class OxExperience {
         this._currentModel = this._models[index];
         if (this._currentModel) {
             this.scaleScene(this._scale);
+            this.rotateCar(this._rotation);
             this._scene.add(this._currentModel);
 
             // Initialize animation if the model has animations
@@ -323,7 +326,8 @@ class OxExperience {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
                 this._lastTouchX = event.touches[0].clientX;
-                this.rotateCar(this._currentModel.rotation.y + deltaX * 0.01); // Adjust rotation
+                this._rotation = this._currentModel.rotation.y + deltaX * 0.01;
+                this.rotateCar(this._rotation); // Adjust rotation
             }
         });
 
