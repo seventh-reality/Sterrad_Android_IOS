@@ -232,6 +232,11 @@ class OxExperience {
             this._camera.aspect = cameraParams.aspect;
             this._camera.updateProjectionMatrix();
             this._renderer.setSize(width, height);
+
+              const cans = document.getElementById("renderer");
+            cans.style.setProperty("left", `0px`, "important");
+            cans.style.setProperty("top", `0px`, "important");
+            
         } catch (err) {
             console.error("Error handling resize", err);
         }
