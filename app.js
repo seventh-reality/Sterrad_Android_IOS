@@ -252,6 +252,7 @@ class OxExperience {
         const vid = document.getElementsByTagName("video")[0];
         vid.style.setProperty("left", `0px`, "important");
         vid.style.setProperty("top", `0px`, "important");
+        vid.style.setProperty("height", `${canvas.height}px`, "important");
     }
 
     changeModelsColor(value) {
@@ -545,7 +546,7 @@ class OxExperienceUI {
 
     hideLoading() {
         this._loadingScreen.style.display = "none";
-        this._transformControls.style.display = "block";
+        this._transformControls.style.display = "flex";
     }
 
     showError(title, message) {
