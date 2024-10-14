@@ -97,8 +97,7 @@ class OxExperience {
                         if (index === 0) {
                             this._currentModel = model;
                             this._modelPlaced = true;
-                            this.scaleScene(this._scale);
-                            this.rotateCar(this._rotation);
+                            this.scaleScene(this._scale);                            
                             this._scene.add(model);
                         }
                     } catch (err) {
