@@ -16,7 +16,7 @@ class OxExperience {
     _CarPlaced = false;
     _gltfData = [];
     oxSDK;
-    _scale = 0.5;
+    _scale = 0.4;
     _rotation = 0;
     _modelPlaced = false;
     _lastPinchDistance = null; // To track pinch zoom
