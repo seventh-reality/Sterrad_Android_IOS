@@ -18,12 +18,12 @@ class OxExperience {
     oxSDK;
     _scale = 0.1;
     _modelPlaced = false;
-    _lastPinchDistance = null; // To track pinch zoom
-    _lastTouchX = null; // To track single-finger rotation
-    
-    // Specific improvements for iOS
+    _lastPinchDistance = null;
+    _lastTouchX = null;
+
     _iosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    _poseUpdateThreshold = 0.05;  // Adjustable threshold for pose updates
+    _poseUpdateThreshold = 0.01; // Lower threshold for iOS
+    _lastPose = new THREE.Matrix4(); // To store the last pose
 
     async init() {
         try {
@@ -40,24 +40,20 @@ class OxExperience {
             this._envMap.mapping = THREE.EquirectangularReflectionMapping;
             this._envMap.encoding = THREE.sRGBEncoding;
 
-            // Subscribe to frame updates
             this.oxSDK.subscribe(OnirixSDK.Events.OnFrame, () => {
                 const delta = this._clock.getDelta();
                 this._animationMixers.forEach((mixer) => mixer.update(delta));
                 this.render();
             });
 
-            // Subscribe to pose updates
             this.oxSDK.subscribe(OnirixSDK.Events.OnPose, (pose) => {
                 this.updatePose(pose);
             });
 
-            // Resize handler
             this.oxSDK.subscribe(OnirixSDK.Events.OnResize, () => {
                 this.onResize();
             });
 
-            // HitTest for placing models on surface
             this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
                 if (this._modelPlaced && !this.isCarPlaced()) {
                     this._models.forEach((model) => {
@@ -66,7 +62,6 @@ class OxExperience {
                 }
             });
 
-            // Load models
             const modelsToLoad = ["Recticle.glb", "Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
             const gltfLoader = new GLTFLoader();
             modelsToLoad.forEach((modelUrl, index) => {
@@ -103,13 +98,12 @@ class OxExperience {
 
     async initSDK() {
         try {
-            // iOS specific surface tracking configuration
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
-                stability: this._iosDevice ? 1 : 1, // Adjust stability level for iOS
-                hitTestRate: this._iosDevice ? 15 : 30, // Reduce hit test rate on iOS
+                stability: this._iosDevice ? 2 : 1, // Increase stability for iOS
+                hitTestRate: this._iosDevice ? 15 : 30, // Adjust hit test rate
             };
-            this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
+            this.oxSDK = new OnirixSDK("your_sdk_key_here");
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
@@ -177,9 +171,15 @@ class OxExperience {
         try {
             const modelViewMatrix = new THREE.Matrix4().fromArray(pose);
             const cameraPosition = new THREE.Vector3().setFromMatrixPosition(modelViewMatrix);
-            if (this._camera.position.distanceTo(cameraPosition) > this._poseUpdateThreshold) {
-                this._camera.matrix = modelViewMatrix;
-                this._camera.matrixWorldNeedsUpdate = true;
+
+            // Check the distance from the last valid pose to reduce jitter
+            if (this._lastPose && this._lastPose.equals(modelViewMatrix) === false) {
+                const distance = this._camera.position.distanceTo(cameraPosition);
+                if (distance > this._poseUpdateThreshold) {
+                    this._camera.matrix = modelViewMatrix;
+                    this._camera.matrixWorldNeedsUpdate = true;
+                }
+                this._lastPose.copy(modelViewMatrix); // Update last pose
             }
         } catch (err) {
             console.error("Error updating pose", err);
@@ -199,12 +199,15 @@ class OxExperience {
             console.error("Error handling resize", err);
         }
     }
-       scaleScene(value) {
+
+    scaleScene(value) {
         this._currentModel.scale.set(value, value, value);
     }
-     rotateCar(value) {
+
+    rotateCar(value) {
         this._currentModel.rotation.y = value;
     }
+
     changeModelsColor(value) {
         if (this._currentModel) {
             this._currentModel.traverse((child) => {
@@ -214,6 +217,7 @@ class OxExperience {
             });
         }
     }
+
     switchModel(index) {       
         if (this._currentModel) {
             this._scene.remove(this._currentModel);
@@ -226,12 +230,12 @@ class OxExperience {
         if (this._currentModel) {
             this._scene.add(this._currentModel);           
             const mixer = new THREE.AnimationMixer(this._currentModel);
-            const gltf = this._gltfData[index]; // Assuming you store the GLTF data
+            const gltf = this._gltfData[index];
             if (gltf && gltf.animations && gltf.animations.length) {
                 gltf.animations.forEach((clip) => {
                     mixer.clipAction(clip).play();
                 });
-                this._animationMixers[index] = mixer; // Store the mixer for the new model
+                this._animationMixers[index] = mixer;
                 setTimeout(() => {
                     mixer.stopAllAction();
                 }, 9999);
@@ -242,7 +246,7 @@ class OxExperience {
     setupDeviceMotion() {
         if (this._iosDevice) {
             window.addEventListener("deviceorientation", (event) => {
-                // Handle iOS-specific device orientation handling
+                // Handle iOS-specific device orientation handling if needed
             });
         }
     }
@@ -285,6 +289,7 @@ class OxExperience {
         return Math.sqrt(dx * dx + dy * dy);
     }
 }
+
 class OxExperienceUI {
     _loadingScreen = null;
     _errorScreen = null;
