@@ -63,7 +63,7 @@ class OxExperience {
             });
 
             this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                if (hitResult.quality >= 0.5 && !this.isCarPlaced()) {
+                if (this._modelPlaced  && !this.isCarPlaced()) {
                     this._models.forEach((model) => {
                         model.position.copy(hitResult.position);
                     });
