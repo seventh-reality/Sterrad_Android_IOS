@@ -103,7 +103,7 @@ class OxExperience {
                 stability: this._iosDevice ? 2 : 1, // Increase stability for iOS
                 hitTestRate: this._iosDevice ? 15 : 30, // Adjust hit test rate
             };
-            this.oxSDK = new OnirixSDK("your_sdk_key_here");
+            this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
