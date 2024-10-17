@@ -246,10 +246,6 @@ class OxExperience {
         return Math.sqrt(dx * dx + dy * dy);
     }
 }
-
-// Initialize and run the experience
-const experience = new OxExperience();
-experience.init();
 class OxExperienceUI {
     _loadingScreen = null;
     _errorScreen = null;
