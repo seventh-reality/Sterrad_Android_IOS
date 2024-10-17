@@ -2,10 +2,7 @@ import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk
 import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
-
 class OxExperience {
-    _stabilityFilter = [];
-    _maxFramesToAverage = 5; 
     _renderer = null;
     _scene = null;
     _camera = null;
@@ -22,7 +19,6 @@ class OxExperience {
     _modelPlaced = false;
     _lastPinchDistance = null; // To track pinch zoom
     _lastTouchX = null; // To track single-finger rotation
-
     async init() {
         try {
             this._raycaster = new THREE.Raycaster();
@@ -34,12 +30,10 @@ class OxExperience {
             let isRotating = false;
             let touchStartAngle = 0;
             let initialRotationY = 0;
-
             const textureLoader = new THREE.TextureLoader();
             this._envMap = textureLoader.load("envmap.jpg");
             this._envMap.mapping = THREE.EquirectangularReflectionMapping;
             this._envMap.encoding = THREE.sRGBEncoding;
-
             this.oxSDK.subscribe(OnirixSDK.Events.OnFrame, () => {
                 try {
                     const delta = this._clock.getDelta();
@@ -49,27 +43,24 @@ class OxExperience {
                     console.error("Error during frame update", err);
                 }
             });
-
-            this.oxSDK.subscribe(OnirixSDK.Events.OnPose, (pose) => {
+           this.oxSDK.subscribe(OnirixSDK.Events.OnPose, (pose) => {
                 try {
-                    this.updateSmoothedPose(pose);
+                    this.updatePose(pose);
                 } catch (err) {
                     console.error("Error updating pose", err);
                 }
             });
-
             this.oxSDK.subscribe(OnirixSDK.Events.OnResize, () => {
                 this.onResize();
             });
 
             this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                if (this._modelPlaced  && !this.isCarPlaced()) {
+                if (this._modelPlaced && !this.isCarPlaced()) {
                     this._models.forEach((model) => {
                         model.position.copy(hitResult.position);
                     });
                 }
             });
-
             const modelsToLoad = ["Recticle.glb", "Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
             const gltfLoader = new GLTFLoader();
             modelsToLoad.forEach((modelUrl, index) => {
@@ -83,12 +74,10 @@ class OxExperience {
                                 child.material.needsUpdate = true;
                             }
                         });
-
                         if (gltf.animations && gltf.animations.length) {
                             const mixer = new THREE.AnimationMixer(model);
                             gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
                             this._animationMixers.push(mixer);
-
                             setTimeout(() => {
                                 mixer.stopAllAction();
                             }, 9999);
@@ -115,93 +104,49 @@ class OxExperience {
         }
         this.addTouchListeners();
     }
-
     async initSDK() {
         try {
             this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
             };
-             // iOS compatibility check
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (isIOS) {
-            config.iosUseARKit = true;
-        }
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
             throw err;
         }
     }
-       // Smoothed Pose Update function
-    updateSmoothedPose(pose) {
-        // Store the pose in the stability filter
-        this._stabilityFilter.push(pose);
-        if (this._stabilityFilter.length > this._maxFramesToAverage) {
-            this._stabilityFilter.shift();  // Keep only the latest poses
-        }
-
-        // Average the poses for smoothing
-        const smoothedPose = this.averagePoses(this._stabilityFilter);
-
-        // Apply the smoothed pose to the camera
-        this.updatePose(smoothedPose);
-    }
-
-    // Average poses
-    averagePoses(poses) {
-        const length = poses.length;
-        const averagedPose = new Array(16).fill(0);
-
-        for (let i = 0; i < length; i++) {
-            const pose = poses[i];
-            for (let j = 0; j < 16; j++) {
-                averagedPose[j] += pose[j] / length;
-            }
-        }
-
-        return averagedPose;
-    }
-    
     placeCar() {
         this._carPlaced = true;
         this.oxSDK.start();
     }
-
     isCarPlaced() {
         return this._carPlaced;
     }
-
     setupRenderer(renderCanvas) {
         try {
             const width = renderCanvas.width;
             const height = renderCanvas.height;
-
             this._renderer = new THREE.WebGLRenderer({ canvas: renderCanvas, alpha: true });
             this._renderer.setClearColor(0x000000, 0);
             this._renderer.setSize(width, height);
             this._renderer.outputEncoding = THREE.sRGBEncoding;
-
             const cameraParams = this.oxSDK.getCameraParameters();
             this._camera = new THREE.PerspectiveCamera(cameraParams.fov, cameraParams.aspect, 0.1, 1000);
             this._camera.matrixAutoUpdate = false;
-
             this._scene = new THREE.Scene();
-
             const ambientLight = new THREE.AmbientLight(0x666666, 0.5);
             this._scene.add(ambientLight);
         } catch (err) {
             console.error("Error setting up renderer", err);
         }
     }
-
     addLights() {
         try {
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
             directionalLight.position.set(5, 10, 7.5);
             directionalLight.castShadow = true;
             this._scene.add(directionalLight);
-
             const pointLight = new THREE.PointLight(0xffffff, 1, 100);
             pointLight.position.set(5, 10, 5);
             this._scene.add(pointLight);
@@ -209,7 +154,6 @@ class OxExperience {
             console.error("Error adding lights", err);
         }
     }
-
     setupControls(renderCanvas) {
         try {
             this._controls = new OrbitControls(this._camera, renderCanvas);
@@ -218,13 +162,11 @@ class OxExperience {
             this._controls.enableZoom = true;
             this._controls.enableRotate = true;
             this._controls.enablePan = false;
-
             renderCanvas.addEventListener('touchstart', (event) => {
                 if (event.touches.length === 2) {
                     this._controls.enablePan = false;
                 }
             });
-
             renderCanvas.addEventListener('touchend', () => {
                 this._controls.enablePan = false;
             });
@@ -232,7 +174,6 @@ class OxExperience {
             console.error("Error setting up controls", err);
         }
     }
-
     render() {
         try {
             this._controls.update();
@@ -241,7 +182,6 @@ class OxExperience {
             console.error("Error during rendering", err);
         }
     }
-
     updatePose(pose) {
         try {
             let modelViewMatrix = new THREE.Matrix4();
@@ -252,7 +192,6 @@ class OxExperience {
             console.error("Error updating pose", err);
         }
     }
-
     onResize() {
         try {
             const width = this._renderer.domElement.width;
@@ -272,7 +211,6 @@ class OxExperience {
      rotateCar(value) {
         this._currentModel.rotation.y = value;
     }
-
     changeModelsColor(value) {
         if (this._currentModel) {
             this._currentModel.traverse((child) => {
@@ -282,37 +220,19 @@ class OxExperience {
             });
         }
     }
-
-    // switchModel(index) {
-    //     if (this._currentModel) {
-    //         this._scene.remove(this._currentModel);
-    //     }
-    //     this._currentModel = this._models[index];
-    //     if (this._currentModel) {
-    //         this._scene.add(this._currentModel);
-    //     }
-    // }
-    switchModel(index) {
-        // Stop and remove the current model from the scene
+    switchModel(index) {       
         if (this._currentModel) {
             this._scene.remove(this._currentModel);
-
-            // Stop all animations of the current model
             const currentMixer = this._animationMixers[index];
             if (currentMixer) {
                 currentMixer.stopAllAction();
             }
-        }
-
-        // Set the new model as the current model
+        }     
         this._currentModel = this._models[index];
         if (this._currentModel) {
-            this._scene.add(this._currentModel);
-
-            // Initialize animation if the model has animations
+            this._scene.add(this._currentModel);           
             const mixer = new THREE.AnimationMixer(this._currentModel);
             const gltf = this._gltfData[index]; // Assuming you store the GLTF data
-
             if (gltf && gltf.animations && gltf.animations.length) {
                 gltf.animations.forEach((clip) => {
                     mixer.clipAction(clip).play();
@@ -324,14 +244,8 @@ class OxExperience {
             }
         }
     }
-    // playAudio(audioFile) {
-    //     const audio = new Audio(audioFile);
-    //     audio.play();
-    // }
-    // Add touch listeners for pinch zoom and single-finger rotation
     addTouchListeners() {
         const canvas = this._renderer.domElement;
-
         canvas.addEventListener('touchstart', (event) => {
             if (event.touches.length === 2) {
                 // Pinch zoom start
@@ -341,7 +255,6 @@ class OxExperience {
                 this._lastTouchX = event.touches[0].clientX;
             }
         });
-
         canvas.addEventListener('touchmove', (event) => {
             if (event.touches.length === 2 && this._lastPinchDistance !== null) {
                 // Pinch zoom move
@@ -349,21 +262,17 @@ class OxExperience {
                 const scale = newDistance / this._lastPinchDistance;
                 this._lastPinchDistance = newDistance;
                  this.scaleScene(this._currentModel.scale.x * scale); // Adjust scene scale
-            } else if (event.touches.length === 1 && this._lastTouchX !== null) {
-                // Single finger rotation move
+            } else if (event.touches.length === 1 && this._lastTouchX !== null) {               
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
                 this._lastTouchX = event.touches[0].clientX;
                 this.rotateCar(this._currentModel.rotation.y + deltaX * 0.01); // Adjust rotation
             }
         });
-
-        canvas.addEventListener('touchend', () => {
-            // Reset touch states on end
+        canvas.addEventListener('touchend', () => {           
             this._lastPinchDistance = null;
             this._lastTouchX = null;
         });
     }
-
     getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
@@ -381,13 +290,9 @@ function onTouchMove(event) {
     if (event.touches.length === 1 && previousTouch) {
         const touch = event.touches[0];
         const deltaX = touch.clientX - previousTouch.x;
-        const deltaY = touch.clientY - previousTouch.y;
-
-        // Update cube rotation based on touch movement
+        const deltaY = touch.clientY - previousTouch.y;       
         cube.rotation.y += deltaX * 0.01; // Adjust sensitivity as needed
-        cube.rotation.x += deltaY * 0.01;
-
-        // Update previous touch position
+        cube.rotation.x += deltaY * 0.01;      
         previousTouch = { x: touch.clientX, y: touch.clientY };
     }
 }
@@ -395,7 +300,6 @@ function onTouchMove(event) {
 function onTouchEnd() {
     previousTouch = null; // Reset on touch end
 }
-// Event listeners
 window.addEventListener('touchstart', onTouchStart);
 window.addEventListener('touchmove', onTouchMove);
 window.addEventListener('touchend', onTouchEnd);
@@ -404,7 +308,6 @@ class OxExperienceUI {
     _errorScreen = null;
     _errorTitle = null;
     _errorMessage = null;
-
     init() {
         try {
             this._loadingScreen = document.querySelector("#loading-screen");
@@ -419,7 +322,6 @@ class OxExperienceUI {
             this._backbutton = document.querySelector("#back-button");
             this._insidebuttonscontrols = document.querySelector("#insidebuttons-controls");
             this._insidebuttonscontrols1 = document.querySelector("#insidebuttons-controls1");
-
             document.querySelector("#tap-to-place").addEventListener("click", () => {
                 oxExp.switchModel(1);
                 playAudio("Feture.mp3");
@@ -431,7 +333,6 @@ class OxExperienceUI {
                 this._insidebuttonscontrols1.style.display = "none";
                 this._backbutton.style.display = "none";
             });
-
             document.querySelector("#black").addEventListener("click", () => {
                 oxExp.changeModelsColor(0x000000);
             });
@@ -444,7 +345,6 @@ class OxExperienceUI {
             document.querySelector("#silver").addEventListener("click", () => {
                 oxExp.changeModelsColor(0xc0c0c0);
             });
-
             document.querySelector("#model1").addEventListener("click", () => {
                 oxExp.switchModel(1);
                 playAudio("afterf.mp3");
@@ -454,7 +354,6 @@ class OxExperienceUI {
                 document.getElementById('back-button').style.display = 'block';
                 document.getElementById('model-controls').style.display = 'none';
                 document.getElementById('errorimg').style.display = 'none';
-
             });
             document.querySelector("#model2").addEventListener("click", () => {
                 oxExp.switchModel(2);
@@ -466,12 +365,9 @@ class OxExperienceUI {
                 document.getElementById('model-controls').style.display = 'none';
                 document.getElementById('errorimg').style.display = 'none';
                 document.getElementById('ins7').style.display = 'none';
-
-
             });
             document.querySelector("#back").addEventListener("click", () => {
                 oxExp.switchModel(3);
-                // playAudio("");
                 document.getElementById('insidebuttons-controls1').style.display = 'none';
                 document.getElementById('insidebuttons-controls').style.display = 'none';
                 document.getElementById('back-button').style.display = 'none';
@@ -479,7 +375,6 @@ class OxExperienceUI {
                 document.getElementById('errorimg').style.display = 'none';
                 document.getElementById('ins7').style.display = 'none';
                 document.getElementById('ins4').style.display = 'block';
-
             });
             document.querySelector("#ins1").addEventListener("click", () => {
                 oxExp.switchModel(1);
@@ -488,8 +383,6 @@ class OxExperienceUI {
                 document.getElementById('insidebuttons-controls').style.display = 'block';
                 document.getElementById('insidebuttons-controls1').style.display = 'none';
                 document.getElementById('back-button').style.display = 'block';
-
-
             });
             document.querySelector("#ins2").addEventListener("click", () => {
                 oxExp.switchModel(2);
@@ -498,29 +391,24 @@ class OxExperienceUI {
                 document.getElementById('insidebuttons-controls').style.display = 'block';
                 document.getElementById('insidebuttons-controls1').style.display = 'none';
                 document.getElementById('back-button').style.display = 'block';
-
             });
             document.querySelector("#ins3").addEventListener("click", () => {
                 oxExp.switchModel(3);
                 playAudio("Usage.mp3");
-
                 document.getElementById('errorimg').style.display = 'none';
                 document.getElementById('insidebuttons-controls').style.display = 'block';
                 document.getElementById('insidebuttons-controls1').style.display = 'none';
                 document.getElementById('back-button').style.display = 'block';
-
             });
             document.querySelector("#ins4").addEventListener("click", () => {
                 oxExp.switchModel(4);
                 playAudio("wrong.mp3");
-
                 document.getElementById('insidebuttons-controls').style.display = 'none';
                 document.getElementById('insidebuttons-controls1').style.display = 'flex';
                 document.getElementById('back-button').style.display = 'block';
                 document.getElementById('errorimg').style.display = 'block';
                 document.getElementById('ins7').style.display = 'block';
                 document.getElementById('ins4').style.display = 'none';
-
             });
             document.querySelector("#ins7").addEventListener("click", () => {
                 oxExp.switchModel(4);
@@ -528,7 +416,6 @@ class OxExperienceUI {
                 document.getElementById('errorimg').style.display = 'none';
                 document.getElementById('ins7').style.display = 'none';
                 document.getElementById('ins4').style.display = 'block';
-
             });
             document.querySelector("#ins5").addEventListener("click", () => {
                 oxExp.switchModel(5);
@@ -539,7 +426,6 @@ class OxExperienceUI {
                 document.getElementById('back-button').style.display = 'block';
                 document.getElementById('ins7').style.display = 'none';
                 document.getElementById('ins4').style.display = 'block';
-
             });
             document.querySelector("#ins6").addEventListener("click", () => {
                 oxExp.switchModel(6);
@@ -550,19 +436,16 @@ class OxExperienceUI {
                 document.getElementById('back-button').style.display = 'block';
                 document.getElementById('ins7').style.display = 'none';
                 document.getElementById('ins4').style.display = 'block';
-
             });
 
         } catch (err) {
             console.error("Error initializing UI", err);
         }
     }
-
     hideLoading() {
         this._loadingScreen.style.display = "none";
         this._transformControls.style.display = "block";
     }
-
     showError(title, message) {
         this._errorTitle.textContent = title;
         this._errorMessage.textContent = message;
@@ -572,13 +455,10 @@ class OxExperienceUI {
 var audio = document.getElementById('audioPlayer');
 
 function playAudio(audioFile) {
-    // Stop current audio if playing
     if (!audio.paused) {
         audio.pause();
         audio.currentTime = 0; // Reset time to start
     }
-
-    // Set the new audio source and play
     audio.src = audioFile;
     audio.play().catch(function (error) {
         console.log('Playback prevented:', error);
@@ -586,7 +466,6 @@ function playAudio(audioFile) {
 }
 const oxExp = new OxExperience();
 const oxUI = new OxExperienceUI();
-
 oxExp
     .init()
     .then(() => {
@@ -597,4 +476,3 @@ oxExp
         console.error("Error initializing Onirix SDK", error);
         oxUI.showError("Initialization Error", error.message);
     });
-export { OxExperience, OxExperienceUI };
