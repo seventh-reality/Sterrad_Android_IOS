@@ -199,6 +199,45 @@ class OxExperience {
             console.error("Error handling resize", err);
         }
     }
+       scaleScene(value) {
+        this._currentModel.scale.set(value, value, value);
+    }
+     rotateCar(value) {
+        this._currentModel.rotation.y = value;
+    }
+    changeModelsColor(value) {
+        if (this._currentModel) {
+            this._currentModel.traverse((child) => {
+                if (child.material) {
+                    child.material.color.setHex(value);
+                }
+            });
+        }
+    }
+    switchModel(index) {       
+        if (this._currentModel) {
+            this._scene.remove(this._currentModel);
+            const currentMixer = this._animationMixers[index];
+            if (currentMixer) {
+                currentMixer.stopAllAction();
+            }
+        }     
+        this._currentModel = this._models[index];
+        if (this._currentModel) {
+            this._scene.add(this._currentModel);           
+            const mixer = new THREE.AnimationMixer(this._currentModel);
+            const gltf = this._gltfData[index]; // Assuming you store the GLTF data
+            if (gltf && gltf.animations && gltf.animations.length) {
+                gltf.animations.forEach((clip) => {
+                    mixer.clipAction(clip).play();
+                });
+                this._animationMixers[index] = mixer; // Store the mixer for the new model
+                setTimeout(() => {
+                    mixer.stopAllAction();
+                }, 9999);
+            }
+        }
+    }
 
     setupDeviceMotion() {
         if (this._iosDevice) {
