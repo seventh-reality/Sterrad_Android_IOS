@@ -4,6 +4,8 @@ import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/l
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
 
 class OxExperience {
+    _stabilityFilter = [];
+    _maxFramesToAverage = 5; 
     _renderer = null;
     _scene = null;
     _camera = null;
@@ -50,7 +52,7 @@ class OxExperience {
 
             this.oxSDK.subscribe(OnirixSDK.Events.OnPose, (pose) => {
                 try {
-                    this.updatePose(pose);
+                    this.updateSmoothedPose(pose);
                 } catch (err) {
                     console.error("Error updating pose", err);
                 }
@@ -61,7 +63,7 @@ class OxExperience {
             });
 
             this.oxSDK.subscribe(OnirixSDK.Events.OnHitTestResult, (hitResult) => {
-                if (this._modelPlaced && !this.isCarPlaced()) {
+                if (hitResult.quality >= 0.5 && !this.isCarPlaced()) {
                     this._models.forEach((model) => {
                         model.position.copy(hitResult.position);
                     });
@@ -118,7 +120,7 @@ class OxExperience {
         try {
             this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             const config = {
-                mode: OnirixSDK.TrackingMode.Surface,
+                mode: OnirixSDK.TrackingMode.SLAM,
             };
              // iOS compatibility check
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -131,7 +133,36 @@ class OxExperience {
             throw err;
         }
     }
+       // Smoothed Pose Update function
+    updateSmoothedPose(pose) {
+        // Store the pose in the stability filter
+        this._stabilityFilter.push(pose);
+        if (this._stabilityFilter.length > this._maxFramesToAverage) {
+            this._stabilityFilter.shift();  // Keep only the latest poses
+        }
 
+        // Average the poses for smoothing
+        const smoothedPose = this.averagePoses(this._stabilityFilter);
+
+        // Apply the smoothed pose to the camera
+        this.updatePose(smoothedPose);
+    }
+
+    // Average poses
+    averagePoses(poses) {
+        const length = poses.length;
+        const averagedPose = new Array(16).fill(0);
+
+        for (let i = 0; i < length; i++) {
+            const pose = poses[i];
+            for (let j = 0; j < 16; j++) {
+                averagedPose[j] += pose[j] / length;
+            }
+        }
+
+        return averagedPose;
+    }
+    
     placeCar() {
         this._carPlaced = true;
         this.oxSDK.start();
