@@ -120,6 +120,11 @@ class OxExperience {
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
             };
+             // iOS compatibility check
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            config.iosUseARKit = true;
+        }
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
@@ -561,3 +566,4 @@ oxExp
         console.error("Error initializing Onirix SDK", error);
         oxUI.showError("Initialization Error", error.message);
     });
+export { OxExperience, OxExperienceUI };
