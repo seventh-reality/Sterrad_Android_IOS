@@ -120,7 +120,7 @@ class OxExperience {
         try {
             this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             const config = {
-                mode: OnirixSDK.TrackingMode.SLAM,
+                mode: OnirixSDK.TrackingMode.Surface,
             };
              // iOS compatibility check
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
