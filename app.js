@@ -20,12 +20,10 @@ class OxExperience {
     _modelPlaced = false;
     _lastPinchDistance = null; // To track pinch zoom
     _lastTouchX = null; // To track single-finger rotation
-
+    
     // Specific improvements for iOS
     _iosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     _poseUpdateThreshold = 0.05;  // Adjustable threshold for pose updates
-    _smoothingFactor = 0.9; // Smoothing for pose updates to reduce jitter
-    _previousCameraMatrix = new THREE.Matrix4();
 
     async init() {
         try {
@@ -36,7 +34,7 @@ class OxExperience {
             this.setupRenderer(renderCanvas);
             this.setupControls(renderCanvas);
             this.setupDeviceMotion();
-
+            
             const textureLoader = new THREE.TextureLoader();
             this._envMap = textureLoader.load("envmap.jpg");
             this._envMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -108,8 +106,8 @@ class OxExperience {
             // iOS specific surface tracking configuration
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
-                stability: this._iosDevice ? 3 : 1, // Increase stability for iOS
-                hitTestRate: this._iosDevice ? 10 : 30, // Lower hit test rate on iOS
+                stability: this._iosDevice ? 1 : 1, // Adjust stability level for iOS
+                hitTestRate: this._iosDevice ? 15 : 30, // Reduce hit test rate on iOS
             };
             this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             return this.oxSDK.init(config);
@@ -179,13 +177,10 @@ class OxExperience {
         try {
             const modelViewMatrix = new THREE.Matrix4().fromArray(pose);
             const cameraPosition = new THREE.Vector3().setFromMatrixPosition(modelViewMatrix);
-            const smoothedMatrix = this._previousCameraMatrix.clone().lerp(modelViewMatrix, 1 - this._smoothingFactor); // Apply smoothing
-            
             if (this._camera.position.distanceTo(cameraPosition) > this._poseUpdateThreshold) {
-                this._camera.matrix.copy(smoothedMatrix);
+                this._camera.matrix = modelViewMatrix;
                 this._camera.matrixWorldNeedsUpdate = true;
             }
-            this._previousCameraMatrix.copy(smoothedMatrix); // Update for next frame
         } catch (err) {
             console.error("Error updating pose", err);
         }
@@ -204,15 +199,12 @@ class OxExperience {
             console.error("Error handling resize", err);
         }
     }
-
-    scaleScene(value) {
+       scaleScene(value) {
         this._currentModel.scale.set(value, value, value);
     }
-
-    rotateCar(value) {
+     rotateCar(value) {
         this._currentModel.rotation.y = value;
     }
-
     changeModelsColor(value) {
         if (this._currentModel) {
             this._currentModel.traverse((child) => {
@@ -222,20 +214,19 @@ class OxExperience {
             });
         }
     }
-
-    switchModel(index) {
+    switchModel(index) {       
         if (this._currentModel) {
             this._scene.remove(this._currentModel);
             const currentMixer = this._animationMixers[index];
             if (currentMixer) {
                 currentMixer.stopAllAction();
             }
-        }
+        }     
         this._currentModel = this._models[index];
         if (this._currentModel) {
-            this._scene.add(this._currentModel);
+            this._scene.add(this._currentModel);           
             const mixer = new THREE.AnimationMixer(this._currentModel);
-            const gltf = this._gltfData[index];
+            const gltf = this._gltfData[index]; // Assuming you store the GLTF data
             if (gltf && gltf.animations && gltf.animations.length) {
                 gltf.animations.forEach((clip) => {
                     mixer.clipAction(clip).play();
@@ -467,4 +458,3 @@ oxExp
         console.error("Error initializing Onirix SDK", error);
         oxUI.showError("Initialization Error", error.message);
     });
-
