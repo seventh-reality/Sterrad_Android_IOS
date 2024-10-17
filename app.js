@@ -22,7 +22,7 @@ class OxExperience {
     _lastTouchX = null;
 
     _iosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    _poseUpdateThreshold = 0.01; // Lower threshold for iOS
+    _poseUpdateThreshold = 1; // Lower threshold for iOS
     _lastPose = new THREE.Matrix4(); // To store the last pose
 
     async init() {
@@ -100,8 +100,8 @@ class OxExperience {
         try {
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
-                stability: this._iosDevice ? 2 : 1, // Increase stability for iOS
-                hitTestRate: this._iosDevice ? 15 : 30, // Adjust hit test rate
+                stability: this._iosDevice ? 1 : 1, // Increase stability for iOS
+                hitTestRate: this._iosDevice ? 0 : 15, // Adjust hit test rate
             };
             this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             return this.oxSDK.init(config);
