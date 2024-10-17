@@ -22,7 +22,7 @@ class OxExperience {
     _lastTouchX = null;
 
     _iosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    _poseUpdateThreshold = 1; // Lower threshold for iOS
+    _poseUpdateThreshold = 100; // Lower threshold for iOS
     _lastPose = new THREE.Matrix4(); // To store the last pose
 
     async init() {
