@@ -1,4 +1,4 @@
-import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.5/dist/ox-sdk.esm.js";
+import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
 import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
@@ -8,12 +8,11 @@ class OxExperience {
     _scene = null;
     _camera = null;
     _models = [];
-    _modelIndex = 0;
     _currentModel = null;
     _controls = null;
     _animationMixers = [];
     _clock = null;
-    _CarPlaced = false;
+    _carPlaced = false;
     _gltfData = [];
     oxSDK;
     _scale = 0.1;
@@ -21,20 +20,14 @@ class OxExperience {
     _lastPinchDistance = null;
     _lastTouchX = null;
 
-    _iosDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    _poseUpdateThreshold = 100; // Lower threshold for iOS
-    _lastPose = new THREE.Matrix4(); // To store the last pose
-
     async init() {
         try {
             this._raycaster = new THREE.Raycaster();
             this._clock = new THREE.Clock(true);
-            this._CarPlaced = false;
             const renderCanvas = await this.initSDK();
             this.setupRenderer(renderCanvas);
             this.setupControls(renderCanvas);
-            this.setupDeviceMotion();
-            
+
             const textureLoader = new THREE.TextureLoader();
             this._envMap = textureLoader.load("envmap.jpg");
             this._envMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -62,51 +55,59 @@ class OxExperience {
                 }
             });
 
-            const modelsToLoad = ["Recticle.glb", "Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
-            const gltfLoader = new GLTFLoader();
-            modelsToLoad.forEach((modelUrl, index) => {
-                gltfLoader.load(modelUrl, (gltf) => {
-                    const model = gltf.scene;
-                    model.traverse((child) => {
-                        if (child.material) {
-                            child.material.envMap = this._envMap;
-                            child.material.needsUpdate = true;
-                        }
-                    });
-                    if (gltf.animations && gltf.animations.length) {
-                        const mixer = new THREE.AnimationMixer(model);
-                        gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
-                        this._animationMixers.push(mixer);
-                    }
-                    this._gltfData[index] = gltf;
-                    this._models[index] = model;
-                    if (index === 0) {
-                        this._currentModel = model;
-                        this._modelPlaced = true;
-                        this._scene.add(model);
-                    }
-                });
-            });
-
+            await this.loadModels();
             this.addLights();
         } catch (err) {
             console.error("Error initializing OxExperience", err);
+            throw err;
         }
-
         this.addTouchListeners();
     }
 
     async initSDK() {
         try {
+            this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
-                stability: this._iosDevice ? 1 : 1, // Increase stability for iOS
-                hitTestRate: this._iosDevice ? 0 : 15, // Adjust hit test rate
+                autoStart: true, // Automatically start tracking
+                // Set additional tracking options if available
             };
-            this.oxSDK = new OnirixSDK("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUyMDIsInByb2plY3RJZCI6MTQ0MjgsInJvbGUiOjMsImlhdCI6MTYxNjc1ODY5NX0.8F5eAPcBGaHzSSLuQAEgpdja9aEZ6Ca_Ll9wg84Rp5k");
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
+            throw err;
+        }
+    }
+
+    async loadModels() {
+        const modelsToLoad = ["Recticle.glb", "Steerad.glb", "Sterrad_PARTS.glb", "USAGE.glb", "USP_1.glb", "UPS_2.glb", "UPS_3.glb"];
+        const gltfLoader = new GLTFLoader();
+
+        for (const [index, modelUrl] of modelsToLoad.entries()) {
+            gltfLoader.load(modelUrl, (gltf) => {
+                const model = gltf.scene;
+                model.traverse((child) => {
+                    if (child.material) {
+                        child.material.envMap = this._envMap;
+                        child.material.needsUpdate = true;
+                    }
+                });
+                if (gltf.animations && gltf.animations.length) {
+                    const mixer = new THREE.AnimationMixer(model);
+                    gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+                    this._animationMixers.push(mixer);
+                }
+                this._gltfData[index] = gltf;
+                this._models[index] = model;
+
+                if (index === 0) {
+                    this._currentModel = model;
+                    this._modelPlaced = true;
+                    this._scene.add(model);
+                }
+            }, undefined, (error) => {
+                console.error("Model loading error", error);
+            });
         }
     }
 
@@ -120,84 +121,62 @@ class OxExperience {
     }
 
     setupRenderer(renderCanvas) {
-        try {
-            const width = renderCanvas.width;
-            const height = renderCanvas.height;
-            this._renderer = new THREE.WebGLRenderer({ canvas: renderCanvas, alpha: true });
-            this._renderer.setClearColor(0x000000, 0);
-            this._renderer.setSize(width, height);
-            this._renderer.outputEncoding = THREE.sRGBEncoding;
-            const cameraParams = this.oxSDK.getCameraParameters();
-            this._camera = new THREE.PerspectiveCamera(cameraParams.fov, cameraParams.aspect, 0.1, 1000);
-            this._camera.matrixAutoUpdate = false;
-            this._scene = new THREE.Scene();
-        } catch (err) {
-            console.error("Error setting up renderer", err);
-        }
+        const width = renderCanvas.width;
+        const height = renderCanvas.height;
+        this._renderer = new THREE.WebGLRenderer({ canvas: renderCanvas, alpha: true });
+        this._renderer.setClearColor(0x000000, 0);
+        this._renderer.setSize(width, height);
+        this._renderer.outputEncoding = THREE.sRGBEncoding;
+
+        const cameraParams = this.oxSDK.getCameraParameters();
+        this._camera = new THREE.PerspectiveCamera(cameraParams.fov, cameraParams.aspect, 0.1, 1000);
+        this._camera.matrixAutoUpdate = false;
+        this._scene = new THREE.Scene();
+
+        const ambientLight = new THREE.AmbientLight(0x666666, 0.5);
+        this._scene.add(ambientLight);
     }
 
     addLights() {
-        try {
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(5, 10, 7.5);
-            this._scene.add(directionalLight);
-        } catch (err) {
-            console.error("Error adding lights", err);
-        }
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 7.5);
+        directionalLight.castShadow = true;
+        this._scene.add(directionalLight);
     }
 
     setupControls(renderCanvas) {
-        try {
-            this._controls = new OrbitControls(this._camera, renderCanvas);
-            this._controls.enableDamping = true;
-            this._controls.dampingFactor = 0.25;
-            this._controls.enableZoom = true;
-            this._controls.enableRotate = true;
-        } catch (err) {
-            console.error("Error setting up controls", err);
-        }
+        this._controls = new OrbitControls(this._camera, renderCanvas);
+        this._controls.enableDamping = true;
+        this._controls.dampingFactor = 0.25;
+        this._controls.enableZoom = true;
+        this._controls.enableRotate = true;
+        this._controls.enablePan = false;
     }
 
     render() {
-        try {
-            this._controls.update();
-            this._renderer.render(this._scene, this._camera);
-        } catch (err) {
-            console.error("Error during rendering", err);
-        }
+        this._controls.update();
+        this._renderer.render(this._scene, this._camera);
     }
 
     updatePose(pose) {
-        try {
-            const modelViewMatrix = new THREE.Matrix4().fromArray(pose);
-            const cameraPosition = new THREE.Vector3().setFromMatrixPosition(modelViewMatrix);
+        let modelViewMatrix = new THREE.Matrix4().fromArray(pose);
+        this._camera.matrix = modelViewMatrix;
+        this._camera.matrixWorldNeedsUpdate = true;
 
-            // Check the distance from the last valid pose to reduce jitter
-            if (this._lastPose && this._lastPose.equals(modelViewMatrix) === false) {
-                const distance = this._camera.position.distanceTo(cameraPosition);
-                if (distance > this._poseUpdateThreshold) {
-                    this._camera.matrix = modelViewMatrix;
-                    this._camera.matrixWorldNeedsUpdate = true;
-                }
-                this._lastPose.copy(modelViewMatrix); // Update last pose
-            }
-        } catch (err) {
-            console.error("Error updating pose", err);
-        }
+        // Apply additional stabilization if necessary
+        const cameraPosition = this._camera.position;
+        const targetPosition = new THREE.Vector3(pose[12], pose[13], pose[14]); // Assuming this is the position data in pose
+        cameraPosition.lerp(targetPosition, 0.1); // Smoothly interpolate camera position
     }
 
     onResize() {
-        try {
-            const width = this._renderer.domElement.width;
-            const height = this._renderer.domElement.height;
-            const cameraParams = this.oxSDK.getCameraParameters();
-            this._camera.fov = cameraParams.fov;
-            this._camera.aspect = cameraParams.aspect;
-            this._camera.updateProjectionMatrix();
-            this._renderer.setSize(width, height);
-        } catch (err) {
-            console.error("Error handling resize", err);
-        }
+        const width = this._renderer.domElement.width;
+        const height = this._renderer.domElement.height;
+        const cameraParams = this.oxSDK.getCameraParameters();
+        this._camera.fov = cameraParams.fov;
+        this._camera.aspect = cameraParams.aspect;
+        this._camera.updateProjectionMatrix();
+        this._renderer.setSize(width, height);
     }
 
     scaleScene(value) {
@@ -218,17 +197,17 @@ class OxExperience {
         }
     }
 
-    switchModel(index) {       
+    switchModel(index) {
         if (this._currentModel) {
             this._scene.remove(this._currentModel);
             const currentMixer = this._animationMixers[index];
             if (currentMixer) {
                 currentMixer.stopAllAction();
             }
-        }     
+        }
         this._currentModel = this._models[index];
         if (this._currentModel) {
-            this._scene.add(this._currentModel);           
+            this._scene.add(this._currentModel);
             const mixer = new THREE.AnimationMixer(this._currentModel);
             const gltf = this._gltfData[index];
             if (gltf && gltf.animations && gltf.animations.length) {
@@ -236,59 +215,49 @@ class OxExperience {
                     mixer.clipAction(clip).play();
                 });
                 this._animationMixers[index] = mixer;
-                setTimeout(() => {
-                    mixer.stopAllAction();
-                }, 9999);
             }
-        }
-    }
-
-    setupDeviceMotion() {
-        if (this._iosDevice) {
-            window.addEventListener("deviceorientation", (event) => {
-                // Handle iOS-specific device orientation handling if needed
-            });
         }
     }
 
     addTouchListeners() {
         const canvas = this._renderer.domElement;
-        canvas.addEventListener("touchstart", (event) => {
+        canvas.addEventListener('touchstart', (event) => {
             if (event.touches.length === 2) {
-                this._lastPinchDistance = this.getPinchDistance(event.touches);
+                this._lastPinchDistance = this.getDistance(event.touches);
             } else if (event.touches.length === 1) {
                 this._lastTouchX = event.touches[0].clientX;
             }
         });
 
-        canvas.addEventListener("touchmove", (event) => {
+        canvas.addEventListener('touchmove', (event) => {
             if (event.touches.length === 2 && this._lastPinchDistance !== null) {
-                const pinchDistance = this.getPinchDistance(event.touches);
-                const scaleChange = pinchDistance / this._lastPinchDistance;
-                this._currentModel.scale.multiplyScalar(scaleChange);
-                this._lastPinchDistance = pinchDistance;
+                const newDistance = this.getDistance(event.touches);
+                const scale = newDistance / this._lastPinchDistance;
+                this._lastPinchDistance = newDistance;
+                this.scaleScene(this._currentModel.scale.x * scale);
             } else if (event.touches.length === 1 && this._lastTouchX !== null) {
-                const touchX = event.touches[0].clientX;
-                const rotationDelta = (touchX - this._lastTouchX) * 0.01;
-                this._currentModel.rotation.y += rotationDelta;
-                this._lastTouchX = touchX;
+                const deltaX = event.touches[0].clientX - this._lastTouchX;
+                this._lastTouchX = event.touches[0].clientX;
+                this.rotateCar(this._currentModel.rotation.y + deltaX * 0.01);
             }
         });
 
-        canvas.addEventListener("touchend", (event) => {
-            if (event.touches.length === 0) {
-                this._lastPinchDistance = null;
-                this._lastTouchX = null;
-            }
+        canvas.addEventListener('touchend', () => {
+            this._lastPinchDistance = null;
+            this._lastTouchX = null;
         });
     }
 
-    getPinchDistance(touches) {
+    getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
         return Math.sqrt(dx * dx + dy * dy);
     }
 }
+
+const oxExperience = new OxExperience();
+oxExperience.init();
+
 
 class OxExperienceUI {
     _loadingScreen = null;
