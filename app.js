@@ -1,4 +1,4 @@
-import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.5/dist/ox-sdk.esm.js";
+import OnirixSDK from "https://unpkg.com/@onirix/ar-engine-sdk@1.8.3/dist/ox-sdk.esm.js";
 import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls.js";
@@ -16,8 +16,7 @@ class OxExperience {
     _CarPlaced = false;
     _gltfData = [];
     oxSDK;
-    _scale = 0.3;
-    _rotation = 0;
+    _scale = 0.1;
     _modelPlaced = false;
     _lastPinchDistance = null; // To track pinch zoom
     _lastTouchX = null; // To track single-finger rotation
@@ -97,7 +96,6 @@ class OxExperience {
                         if (index === 0) {
                             this._currentModel = model;
                             this._modelPlaced = true;
-                            this.scaleScene(this._scale);                            
                             this._scene.add(model);
                         }
                     } catch (err) {
@@ -122,7 +120,6 @@ class OxExperience {
             const config = {
                 mode: OnirixSDK.TrackingMode.Surface,
             };
-            // this.oxSDK.setIosVisualizationMode(true);
             return this.oxSDK.init(config);
         } catch (err) {
             console.error("Error initializing Onirix SDK", err);
@@ -144,12 +141,9 @@ class OxExperience {
             const width = renderCanvas.width;
             const height = renderCanvas.height;
 
-            this._renderer = new THREE.WebGLRenderer({ antialias: true, canvas: renderCanvas, alpha: true });
-            this._renderer.setPixelRatio(window.devicePixelRatio);
-            this._renderer.setSize(width, height);
+            this._renderer = new THREE.WebGLRenderer({ canvas: renderCanvas, alpha: true });
             this._renderer.setClearColor(0x000000, 0);
-            // this.positionCanvas();
-            // this._renderer.setSize(width, height);
+            this._renderer.setSize(width, height);
             this._renderer.outputEncoding = THREE.sRGBEncoding;
 
             const cameraParams = this.oxSDK.getCameraParameters();
@@ -232,27 +226,15 @@ class OxExperience {
             this._camera.aspect = cameraParams.aspect;
             this._camera.updateProjectionMatrix();
             this._renderer.setSize(width, height);
-            this.positionCanvas();
         } catch (err) {
             console.error("Error handling resize", err);
         }
     }
     scaleScene(value) {
-        this._currentModel.scale.set(value, value, value);
+        this._scene.scale.set(value, value, value);
     }
-    rotateCar(value) {
-        this._currentModel.rotation.y = value;
-    }
-    positionCanvas() {
-        // const cans = document.getElementById("renderer");
-        const canvas = this._renderer.domElement;
-        canvas.style.setProperty("left", `0px`, "important");
-        canvas.style.setProperty("top", `0px`, "important");
-        const vid = document.getElementsByTagName("video")[0];
-        vid.style.setProperty("left", `0px`, "important");
-        vid.style.setProperty("top", `0px`, "important");
-        vid.style.setProperty("width", `${window.innerWidth}px`, "important");
-        vid.style.setProperty("height", `${window.innerHeight}px`, "important");
+     rotateCar(value) {
+        this._models.rotation.y = value;
     }
 
     changeModelsColor(value) {
@@ -289,8 +271,6 @@ class OxExperience {
         // Set the new model as the current model
         this._currentModel = this._models[index];
         if (this._currentModel) {
-            this.scaleScene(this._scale);
-            this.rotateCar(this._rotation);
             this._scene.add(this._currentModel);
 
             // Initialize animation if the model has animations
@@ -332,14 +312,12 @@ class OxExperience {
                 const newDistance = this.getDistance(event.touches);
                 const scale = newDistance / this._lastPinchDistance;
                 this._lastPinchDistance = newDistance;
-                this._scale = this._currentModel.scale.x * scale;
-                this.scaleScene(this._scale); // Adjust scene scale
+                 this.scaleScene(this._scene.scale.x * scale); // Adjust scene scale
             } else if (event.touches.length === 1 && this._lastTouchX !== null) {
                 // Single finger rotation move
                 const deltaX = event.touches[0].clientX - this._lastTouchX;
                 this._lastTouchX = event.touches[0].clientX;
-                this._rotation = this._currentModel.rotation.y + deltaX * 0.01;
-                this.rotateCar(this._rotation); // Adjust rotation
+                this.rotateCar(this._models.rotation.y + deltaX * 0.01); // Adjust rotation
             }
         });
 
@@ -546,7 +524,7 @@ class OxExperienceUI {
 
     hideLoading() {
         this._loadingScreen.style.display = "none";
-        this._transformControls.style.display = "flex";
+        this._transformControls.style.display = "block";
     }
 
     showError(title, message) {
